@@ -1,0 +1,44 @@
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { isAllowedVideo, saveStream } from "@/lib/storage";
+
+// Streaming upload of an editor's delivery video (see source-videos route for
+// the raw-body approach). Only the assigned editor can deliver.
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (session?.role !== "editor") {
+    return NextResponse.json({ error: "Sem permissão." }, { status: 403 });
+  }
+
+  const { id } = await params;
+  const project = await db.project.findUnique({ where: { id } });
+  if (!project || project.assignedEditorId !== session.userId) {
+    return NextResponse.json({ error: "Projeto não encontrado." }, { status: 404 });
+  }
+
+  const fileName = decodeURIComponent(request.headers.get("x-file-name") ?? "").trim();
+  const label = decodeURIComponent(request.headers.get("x-label") ?? "").trim() || "Vídeo Final";
+  if (!fileName || !isAllowedVideo(fileName)) {
+    return NextResponse.json(
+      { error: "Formato não suportado. Envie arquivos mp4, mov, mkv, webm ou avi." },
+      { status: 400 }
+    );
+  }
+  if (!request.body) {
+    return NextResponse.json({ error: "Arquivo vazio." }, { status: 400 });
+  }
+
+  const { storedName, size } = await saveStream(request.body, fileName);
+  const video = await db.deliveryVideo.create({
+    data: { projectId: id, uploadedById: session.userId, label: label.slice(0, 120), fileName, storedName, size },
+  });
+
+  // A new delivery puts the project under review; manual dragging on the
+  // board can still override this afterwards.
+  if (project.status !== "concluido") {
+    await db.project.update({ where: { id }, data: { status: "em_revisao" } });
+  }
+
+  return NextResponse.json({ id: video.id }, { status: 201 });
+}

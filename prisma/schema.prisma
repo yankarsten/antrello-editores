@@ -1,0 +1,69 @@
+// Prisma schema for Antrello Editores.
+// SQLite for local dev — swap the datasource provider/url for Postgres in production.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// role: "admin" | "editor" (SQLite has no native enums)
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("editor")
+  createdAt    DateTime @default(now())
+
+  projectsCreated  Project[]       @relation("ProjectCreatedBy")
+  projectsAssigned Project[]       @relation("ProjectAssignedEditor")
+  deliveryVideos   DeliveryVideo[]
+}
+
+// status: "novo" | "em_edicao" | "em_revisao" | "concluido"
+model Project {
+  id               String   @id @default(cuid())
+  title            String
+  description      String?
+  deadline         DateTime
+  status           String   @default("novo")
+  assignedEditorId String?
+  createdById      String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  assignedEditor User? @relation("ProjectAssignedEditor", fields: [assignedEditorId], references: [id], onDelete: SetNull)
+  createdBy      User  @relation("ProjectCreatedBy", fields: [createdById], references: [id])
+
+  sourceVideos   SourceVideo[]
+  deliveryVideos DeliveryVideo[]
+}
+
+model SourceVideo {
+  id         String   @id @default(cuid())
+  projectId  String
+  fileName   String
+  storedName String
+  size       Int      @default(0)
+  uploadedAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model DeliveryVideo {
+  id           String   @id @default(cuid())
+  projectId    String
+  uploadedById String
+  label        String   @default("Vídeo Final")
+  fileName     String
+  storedName   String
+  size         Int      @default(0)
+  uploadedAt   DateTime @default(now())
+
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploadedBy User    @relation(fields: [uploadedById], references: [id])
+}
