@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { isAllowedVideo, saveStream } from "@/lib/storage";
+import { isAllowedVideo, saveChunk } from "@/lib/storage";
+import { readChunkMeta } from "@/lib/upload";
 
-// Raw-body streaming upload: one request per file, filename in the
-// x-file-name header. Avoids formData(), which would buffer the whole
-// (potentially multi-GB) file in memory.
+// Chunked raw-body upload: the client sends the file as a sequence of <100 MB
+// parts (so each request fits under Cloudflare's proxy body limit), keyed by
+// the x-upload-id header. The DB row is created only on the final chunk.
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (session?.role !== "admin") {
@@ -27,9 +28,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "Arquivo vazio." }, { status: 400 });
   }
 
-  const { storedName, size } = await saveStream(request.body, fileName);
+  const { uploadId, chunkIndex, totalChunks } = readChunkMeta(request);
+  let result;
+  try {
+    result = await saveChunk({ uploadId, chunkIndex, totalChunks, originalName: fileName, body: request.body });
+  } catch {
+    return NextResponse.json({ error: "Falha ao gravar o arquivo. Tente novamente." }, { status: 400 });
+  }
+  if (!result.done) {
+    return NextResponse.json({ received: chunkIndex }, { status: 200 });
+  }
+
   const video = await db.sourceVideo.create({
-    data: { projectId: id, fileName, storedName, size },
+    data: { projectId: id, fileName, storedName: result.storedName!, size: result.size! },
   });
 
   return NextResponse.json({ id: video.id }, { status: 201 });

@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    image: antrello-editores
+    container_name: antrello-editores
+    restart: unless-stopped
+    # Published on the host so the machine's cloudflared tunnel (systemd service,
+    # /etc/cloudflared/config.yml) can reach it at http://localhost:3000 and
+    # serve it publicly at https://antrello.com.br. See DEPLOY.md.
+    ports:
+      - "3000:3000"
+    environment:
+      # SQLite lives on a named volume (see below) so data survives rebuilds.
+      DATABASE_URL: "file:/app/data/dev.db"
+      # CHANGE THIS in production — signs the session JWTs.
+      AUTH_SECRET: "${AUTH_SECRET:-change-me-in-production-please}"
+      # Seed admin account (created by prisma db seed on first boot).
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@antrello.com}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin123}"
+      ADMIN_NAME: "${ADMIN_NAME:-Administrador}"
+    volumes:
+      - db-data:/app/data
+      - video-storage:/app/storage
+
+volumes:
+  db-data:
+  video-storage:

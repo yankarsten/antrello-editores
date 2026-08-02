@@ -35,24 +35,26 @@ interface Props {
   onAllDone?: () => void;
 }
 
-/** Uploads one XHR request per file (raw body) so the server can stream large
- * videos straight to disk, with real per-file progress from xhr.upload. */
-function uploadFile(
-  entry: FileEntry,
+// Each request body must stay under Cloudflare's 100 MB proxy limit, so files
+// are sent as a sequence of chunks this size. The server reassembles them.
+const CHUNK_SIZE = 90 * 1024 * 1024;
+
+/** POSTs a single chunk (raw body) and reports bytes-sent for this chunk. */
+function sendChunk(
+  blob: Blob,
   endpoint: string,
-  extraHeaders: Record<string, string>,
-  onProgress: (pct: number) => void
+  headers: Record<string, string>,
+  onChunkProgress: (loaded: number) => void
 ): Promise<{ ok: boolean; error?: string }> {
   return new Promise((resolve) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", endpoint);
-    xhr.setRequestHeader("x-file-name", encodeURIComponent(entry.file.name));
     xhr.setRequestHeader("Content-Type", "application/octet-stream");
-    for (const [k, v] of Object.entries(extraHeaders)) {
-      xhr.setRequestHeader(k, encodeURIComponent(v));
+    for (const [k, v] of Object.entries(headers)) {
+      xhr.setRequestHeader(k, v);
     }
     xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+      if (e.lengthComputable) onChunkProgress(e.loaded);
     };
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
@@ -66,8 +68,44 @@ function uploadFile(
       }
     };
     xhr.onerror = () => resolve({ ok: false, error: "Falha de conexão durante o envio." });
-    xhr.send(entry.file);
+    xhr.send(blob);
   });
+}
+
+/** Uploads a file as ordered <100 MB chunks so the server can stream each part
+ * straight to disk, with real aggregate progress across the whole file. */
+async function uploadFile(
+  entry: FileEntry,
+  endpoint: string,
+  extraHeaders: Record<string, string>,
+  onProgress: (pct: number) => void
+): Promise<{ ok: boolean; error?: string }> {
+  const { file } = entry;
+  const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
+  const baseHeaders: Record<string, string> = {
+    "x-file-name": encodeURIComponent(file.name),
+    "x-upload-id": crypto.randomUUID(),
+    "x-total-chunks": String(totalChunks),
+  };
+  for (const [k, v] of Object.entries(extraHeaders)) {
+    baseHeaders[k] = encodeURIComponent(v);
+  }
+
+  for (let i = 0; i < totalChunks; i++) {
+    const start = i * CHUNK_SIZE;
+    const chunk = file.slice(start, Math.min(start + CHUNK_SIZE, file.size));
+    const result = await sendChunk(
+      chunk,
+      endpoint,
+      { ...baseHeaders, "x-chunk-index": String(i) },
+      (loaded) => {
+        const pct = file.size > 0 ? Math.round(((start + loaded) / file.size) * 100) : 100;
+        onProgress(Math.min(100, pct));
+      }
+    );
+    if (!result.ok) return result;
+  }
+  return { ok: true };
 }
 
 const UploadDropzone = forwardRef<UploadDropzoneHandle, Props>(function UploadDropzone(

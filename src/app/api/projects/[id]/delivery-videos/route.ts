@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { isAllowedVideo, saveStream } from "@/lib/storage";
+import { isAllowedVideo, saveChunk } from "@/lib/storage";
+import { readChunkMeta } from "@/lib/upload";
 
-// Streaming upload of an editor's delivery video (see source-videos route for
-// the raw-body approach). Only the assigned editor can deliver.
+// Chunked upload of an editor's delivery video (see source-videos route for the
+// chunking approach). Only the assigned editor can deliver.
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (session?.role !== "editor") {
@@ -29,9 +30,26 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "Arquivo vazio." }, { status: 400 });
   }
 
-  const { storedName, size } = await saveStream(request.body, fileName);
+  const { uploadId, chunkIndex, totalChunks } = readChunkMeta(request);
+  let result;
+  try {
+    result = await saveChunk({ uploadId, chunkIndex, totalChunks, originalName: fileName, body: request.body });
+  } catch {
+    return NextResponse.json({ error: "Falha ao gravar o arquivo. Tente novamente." }, { status: 400 });
+  }
+  if (!result.done) {
+    return NextResponse.json({ received: chunkIndex }, { status: 200 });
+  }
+
   const video = await db.deliveryVideo.create({
-    data: { projectId: id, uploadedById: session.userId, label: label.slice(0, 120), fileName, storedName, size },
+    data: {
+      projectId: id,
+      uploadedById: session.userId,
+      label: label.slice(0, 120),
+      fileName,
+      storedName: result.storedName!,
+      size: result.size!,
+    },
   });
 
   // A new delivery puts the project under review; manual dragging on the
