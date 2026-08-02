@@ -52,19 +52,15 @@ export default function DeliveryUpload({
           maxLength={120}
           disabled={uploading}
         />
-        <p className="mt-1.5 text-xs text-zinc-500">
+        <p className="mt-2 text-xs text-ink/60">
           Use nomes como “Vídeo Final”, “Vídeo Final R2”… para identificar cada revisão.
         </p>
       </div>
 
       <UploadDropzone ref={dropzoneRef} multiple={false} />
 
-      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
-      {success && (
-        <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-          Entrega enviada! O projeto entrou em revisão.
-        </p>
-      )}
+      {error && <p className="alert-error">{error}</p>}
+      {success && <p className="alert-success">Entrega enviada! O projeto entrou em revisão.</p>}
 
       <div className="flex justify-end">
         <button type="submit" disabled={uploading} className="btn-primary">

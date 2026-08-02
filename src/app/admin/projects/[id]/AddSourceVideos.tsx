@@ -10,17 +10,17 @@ export default function AddSourceVideos({ projectId }: { projectId: string }) {
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="btn-secondary !px-3 !py-1.5 text-xs">
+      <button type="button" onClick={() => setOpen(true)} className="btn-accent !px-4 !py-2 text-sm">
         + Adicionar vídeos brutos
       </button>
     );
   }
 
   return (
-    <div className="card p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-zinc-700">Adicionar vídeos brutos</h3>
-        <button type="button" onClick={() => setOpen(false)} className="text-xs text-zinc-400 hover:text-zinc-600">
+    <div className="card p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-base font-medium text-ink">Adicionar vídeos brutos</h3>
+        <button type="button" onClick={() => setOpen(false)} className="text-xs text-ink/60 transition hover:text-ink">
           Fechar
         </button>
       </div>

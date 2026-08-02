@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import StatusBadge from "@/components/StatusBadge";
 import VideoList, { type VideoItem } from "@/components/VideoList";
+import { SectionHeading } from "@/components/PageHeader";
 import DeliveryUpload from "./DeliveryUpload";
 
 export const dynamic = "force-dynamic";
@@ -46,33 +47,32 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-xl font-bold text-zinc-900">{project.title}</h1>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
+      <h1 className="text-3xl font-medium leading-tight">
+        <span className="pill">{project.title}</span>
+      </h1>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         <StatusBadge status={project.status} />
         <DeadlineBadge deadline={project.deadline} status={project.status} />
       </div>
 
       {project.description && (
-        <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-600">{project.description}</p>
+        <p className="mt-5 whitespace-pre-wrap text-sm leading-relaxed text-ink/70">{project.description}</p>
       )}
 
       {project.notes && (
-        <div className="card mt-4 p-5">
-          <h2 className="text-sm font-semibold text-zinc-700">Observações</h2>
-          <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-zinc-600">{project.notes}</p>
+        <div className="card-mist mt-6 p-6">
+          <SectionHeading>Observações</SectionHeading>
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink/80">{project.notes}</p>
         </div>
       )}
 
-      <section className="mt-8">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-base font-semibold text-zinc-800">
-            Vídeos brutos{" "}
-            <span className="text-sm font-normal text-zinc-400">({sourceItems.length})</span>
-          </h2>
+      <section className="mt-10">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <SectionHeading count={sourceItems.length}>Vídeos brutos</SectionHeading>
           {sourceItems.length > 0 && (
             <a
               href={`/api/projects/${project.id}/source-videos/zip`}
-              className="btn-secondary !px-3 !py-1.5 text-xs"
+              className="btn-accent !px-4 !py-2 text-sm"
               download
             >
               Baixar todos (.zip)
@@ -85,18 +85,19 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
         />
       </section>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-base font-semibold text-zinc-800">Enviar entrega</h2>
-        <div className="card p-5">
+      <section className="mt-10">
+        <div className="mb-4">
+          <SectionHeading>Enviar entrega</SectionHeading>
+        </div>
+        <div className="rounded-card border border-ink bg-white p-8 shadow-hard">
           <DeliveryUpload projectId={project.id} suggestedLabel={suggestedLabel} />
         </div>
       </section>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-base font-semibold text-zinc-800">
-          Minhas entregas{" "}
-          <span className="text-sm font-normal text-zinc-400">({deliveryItems.length})</span>
-        </h2>
+      <section className="mt-10">
+        <div className="mb-4">
+          <SectionHeading count={deliveryItems.length}>Minhas entregas</SectionHeading>
+        </div>
         <VideoList
           videos={deliveryItems}
           emptyText="Você ainda não enviou nenhuma entrega para este projeto."

@@ -31,9 +31,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const editor = await db.user.findFirst({ where: { id: body.assignedEditorId, role: "editor" } });
       if (!editor) return NextResponse.json({ error: "Editor não encontrado." }, { status: 400 });
       data.assignedEditorId = editor.id;
-      // Assigning an editor moves a fresh project into "Em edição" unless the
-      // caller is also setting the status explicitly.
-      if (!data.status && project.status === "novo") data.status = "em_edicao";
     } else {
       return NextResponse.json({ error: "Editor inválido." }, { status: 400 });
     }

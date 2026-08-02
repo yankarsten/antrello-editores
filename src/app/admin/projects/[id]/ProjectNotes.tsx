@@ -41,7 +41,7 @@ export default function ProjectNotes({
   }
 
   return (
-    <div className="card mt-4 p-5">
+    <div className="card mt-6 p-6">
       <label htmlFor="notes" className="label">Observações</label>
       <textarea
         id="notes"
@@ -55,9 +55,9 @@ export default function ProjectNotes({
         }}
         disabled={busy}
       />
-      {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
-      <div className="mt-3 flex items-center justify-end gap-3">
-        {done && !dirty && <span className="text-xs text-emerald-600">Observações salvas.</span>}
+      {error && <p className="alert-error mt-4">{error}</p>}
+      <div className="mt-4 flex items-center justify-end gap-3">
+        {done && !dirty && <span className="chip bg-accent text-ink">Observações salvas</span>}
         <button
           type="button"
           onClick={handleSave}

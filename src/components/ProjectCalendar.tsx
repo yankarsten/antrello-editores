@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
+import { DEFAULT_STATUS, STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
+import { STATUS_CHIP, STATUS_DOT } from "@/lib/status-ui";
 import { formatDate } from "@/lib/format";
 
 export interface CalendarProject {
@@ -23,24 +24,10 @@ export interface CalendarEditor {
 
 const WEEKDAYS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
-const CHIP_CLASSES: Record<ProjectStatus, string> = {
-  novo: "bg-sky-50 text-sky-800 ring-sky-200 hover:bg-sky-100",
-  em_edicao: "bg-violet-50 text-violet-800 ring-violet-200 hover:bg-violet-100",
-  em_revisao: "bg-amber-50 text-amber-800 ring-amber-200 hover:bg-amber-100",
-  concluido: "bg-emerald-50 text-emerald-800 ring-emerald-200 hover:bg-emerald-100",
-};
-
-const DOT_CLASSES: Record<ProjectStatus, string> = {
-  novo: "bg-sky-400",
-  em_edicao: "bg-violet-400",
-  em_revisao: "bg-amber-400",
-  concluido: "bg-emerald-400",
-};
-
 const monthTitleFormatter = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" });
 
 function statusOf(status: string): ProjectStatus {
-  return (status in STATUS_LABELS ? status : "novo") as ProjectStatus;
+  return (status in STATUS_LABELS ? status : DEFAULT_STATUS) as ProjectStatus;
 }
 
 /** "YYYY-MM-DD" from a locally-built date — mirrors lib/format's dayKey shape. */
@@ -131,28 +118,28 @@ export default function ProjectCalendar({
 
   return (
     <div>
-      <div className="card p-4">
+      <div className="card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => shiftMonth(-1)} className="btn-secondary !px-3 !py-1.5 text-xs" aria-label="Mês anterior">
               ‹
             </button>
-            <h2 className="min-w-[10.5rem] text-center text-sm font-semibold capitalize text-zinc-800">
+            <h2 className="min-w-[10.5rem] text-center text-base font-medium capitalize text-ink">
               {monthTitleFormatter.format(new Date(year, month, 15))}
             </h2>
             <button type="button" onClick={() => shiftMonth(1)} className="btn-secondary !px-3 !py-1.5 text-xs" aria-label="Próximo mês">
               ›
             </button>
-            <button type="button" onClick={goToToday} className="btn-secondary !px-3 !py-1.5 text-xs">
+            <button type="button" onClick={goToToday} className="btn-accent !px-3 !py-1.5 text-xs">
               Hoje
             </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2 text-xs text-zinc-600">
+            <label className="flex items-center gap-2 text-xs text-ink">
               <input
                 type="checkbox"
-                className="h-3.5 w-3.5 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                className="h-4 w-4 rounded-[4px] border-ink text-ink focus:ring-accent"
                 checked={hideDone}
                 onChange={(e) => setHideDone(e.target.checked)}
               />
@@ -175,17 +162,19 @@ export default function ProjectCalendar({
           </div>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-5 overflow-x-auto">
           <div className="min-w-[46rem]">
-            <div className="grid grid-cols-7 gap-px border-b border-zinc-200 pb-2">
+            <div className="grid grid-cols-7 gap-px pb-2">
               {WEEKDAYS.map((day) => (
-                <div key={day} className="text-center text-xs font-medium uppercase tracking-wide text-zinc-400">
+                <div key={day} className="text-center text-xs font-medium uppercase tracking-wide text-ink/50">
                   {day}
                 </div>
               ))}
             </div>
 
-            <div className="mt-px grid grid-cols-7 gap-px bg-zinc-200">
+            {/* The 1px ink gaps double as the grid rules, so the month reads as
+                one bordered block rather than a set of floating cells. */}
+            <div className="grid grid-cols-7 gap-px overflow-hidden rounded-control border border-ink bg-ink">
               {weeks.flat().map((date) => {
                 const key = localKey(date);
                 const inMonth = date.getMonth() === month;
@@ -200,16 +189,16 @@ export default function ProjectCalendar({
                     key={key}
                     onClick={() => setSelectedDay(isSelected ? null : key)}
                     className={`flex min-h-[6.5rem] flex-col gap-1 p-1.5 text-left transition ${
-                      inMonth ? "bg-white" : "bg-zinc-50"
-                    } ${isSelected ? "ring-2 ring-inset ring-indigo-500" : "hover:bg-indigo-50/60"}`}
+                      inMonth ? "bg-white" : "bg-mist"
+                    } ${isSelected ? "ring-2 ring-inset ring-ink" : "hover:bg-accent/40"}`}
                   >
                     <span
                       className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
                         isToday
-                          ? "bg-indigo-600 font-semibold text-white"
+                          ? "bg-ink font-medium text-white"
                           : inMonth
-                            ? "text-zinc-600"
-                            : "text-zinc-400"
+                            ? "text-ink"
+                            : "text-ink/40"
                       }`}
                     >
                       {date.getDate()}
@@ -221,9 +210,9 @@ export default function ProjectCalendar({
                         <span
                           key={project.id}
                           title={`${project.title} — ${project.editorName ?? "Sem editor atribuído"} (${STATUS_LABELS[statusOf(project.status)]})`}
-                          className={`flex items-center gap-1 truncate rounded px-1.5 py-0.5 text-[11px] leading-tight ring-1 ring-inset ${
-                            CHIP_CLASSES[statusOf(project.status)]
-                          } ${overdue ? "!ring-red-400" : ""}`}
+                          className={`flex items-center gap-1 truncate rounded-[6px] border px-1.5 py-0.5 text-[11px] leading-tight transition ${
+                            STATUS_CHIP[statusOf(project.status)]
+                          } ${overdue ? "border-red-500" : "border-ink"}`}
                         >
                           {overdue && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />}
                           <span className="truncate">{project.title}</span>
@@ -232,7 +221,7 @@ export default function ProjectCalendar({
                     })}
 
                     {dayProjects.length > shown.length && (
-                      <span className="px-1.5 text-[11px] font-medium text-zinc-500">
+                      <span className="px-1.5 text-[11px] font-medium text-ink/60">
                         +{dayProjects.length - shown.length} mais
                       </span>
                     )}
@@ -243,25 +232,25 @@ export default function ProjectCalendar({
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-100 pt-3 text-xs text-zinc-500">
+        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ink/15 pt-4 text-xs text-ink/70">
           {(Object.keys(STATUS_LABELS) as ProjectStatus[]).map((status) => (
             <span key={status} className="flex items-center gap-1.5">
-              <span className={`h-2 w-2 rounded-full ${DOT_CLASSES[status]}`} />
+              <span className={`h-2.5 w-2.5 rounded-full border border-ink ${STATUS_DOT[status]}`} />
               {STATUS_LABELS[status]}
             </span>
           ))}
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-red-500" />
+            <span className="h-2.5 w-2.5 rounded-full border border-ink bg-red-500" />
             Prazo vencido
           </span>
         </div>
       </div>
 
-      <section className="mt-6">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-base font-semibold text-zinc-800">
+      <section className="mt-8">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-xl font-medium text-ink">
             {selectedDay ? `Entregas de ${formatDate(`${selectedDay}T12:00:00`)}` : "Entregas do mês"}{" "}
-            <span className="text-sm font-normal text-zinc-400">({listed.length})</span>
+            <span className="font-normal text-ink/50">({listed.length})</span>
           </h2>
           {selectedDay && (
             <button type="button" onClick={() => setSelectedDay(null)} className="btn-secondary !px-3 !py-1.5 text-xs">
@@ -271,7 +260,7 @@ export default function ProjectCalendar({
         </div>
 
         {listed.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-4 py-6 text-center text-sm text-zinc-500">
+          <p className="card-empty">
             {selectedDay
               ? "Nenhuma entrega marcada para este dia."
               : "Nenhuma entrega marcada para este mês."}
@@ -281,16 +270,18 @@ export default function ProjectCalendar({
             {listed.map((project) => {
               const overdue = project.status !== "concluido" && project.day < todayKey;
               return (
-                <li key={project.id} className="card flex flex-wrap items-center gap-3 px-4 py-3">
-                  <span className={`h-2 w-2 shrink-0 rounded-full ${DOT_CLASSES[statusOf(project.status)]}`} />
+                <li className="flex flex-wrap items-center gap-3 rounded-control border border-ink bg-white px-4 py-3" key={project.id}>
+                  <span
+                    className={`h-2.5 w-2.5 shrink-0 rounded-full border border-ink ${STATUS_DOT[statusOf(project.status)]}`}
+                  />
                   <div className="min-w-0 flex-1">
                     <Link
                       href={`/admin/projects/${project.id}`}
-                      className="truncate text-sm font-medium text-zinc-800 hover:text-indigo-600"
+                      className="truncate text-sm font-medium text-ink hover:underline"
                     >
                       {project.title}
                     </Link>
-                    <p className="mt-0.5 truncate text-xs text-zinc-500">
+                    <p className="mt-0.5 truncate text-xs text-ink/60">
                       {project.editorName ?? "Sem editor atribuído"} ·{" "}
                       {STATUS_LABELS[statusOf(project.status)]}
                       {project.deliveryCount > 0 && (
@@ -302,7 +293,7 @@ export default function ProjectCalendar({
                     </p>
                   </div>
                   <span
-                    className={`shrink-0 text-xs font-medium ${overdue ? "text-red-600" : "text-zinc-500"}`}
+                    className={`shrink-0 text-xs font-medium ${overdue ? "text-red-600" : "text-ink/60"}`}
                   >
                     {formatDate(`${project.day}T12:00:00`)}
                   </span>

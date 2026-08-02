@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import KanbanBoard, { type BoardProject } from "@/components/KanbanBoard";
+import PageHeader from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -23,14 +24,10 @@ export default async function AdminBoardPage() {
 
   return (
     <div>
-      <div className="mb-5 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-zinc-900">Quadro de projetos</h1>
-          <p className="mt-0.5 text-sm text-zinc-500">
-            Arraste os cartões para atualizar o status de cada projeto.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Quadro de projetos"
+        subtitle="Arraste os cartões para atualizar o status de cada projeto."
+      />
       <KanbanBoard initialProjects={boardProjects} />
     </div>
   );

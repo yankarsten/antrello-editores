@@ -34,16 +34,16 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+    <main className="flex min-h-screen items-center justify-center bg-mist px-4 py-12">
+      <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
-            Antrello <span className="text-indigo-600">Editores</span>
+          <h1 className="text-4xl font-medium tracking-tight">
+            Antrello <span className="pill">Editores</span>
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">Crie sua conta de editor(a)</p>
+          <p className="mt-3 text-base text-ink/70">Crie sua conta de editor(a)</p>
         </div>
-        <form onSubmit={handleSubmit} className="card p-6">
-          <h2 className="mb-4 text-lg font-semibold">Cadastro de editor(a)</h2>
+        <form onSubmit={handleSubmit} className="rounded-card border border-ink bg-white p-8 shadow-hard sm:p-10">
+          <h2 className="mb-6 text-2xl font-medium">Cadastro de editor(a)</h2>
           <div className="space-y-4">
             <div>
               <label htmlFor="name" className="label">Nome</label>
@@ -85,17 +85,15 @@ export default function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
-            )}
-            <button type="submit" disabled={submitting} className="btn-primary w-full">
+            {error && <p className="alert-error">{error}</p>}
+            <button type="submit" disabled={submitting} className="btn-primary w-full !py-3.5">
               {submitting ? "Criando conta…" : "Criar conta"}
             </button>
           </div>
         </form>
-        <p className="mt-4 text-center text-sm text-zinc-500">
+        <p className="mt-6 text-center text-sm text-ink/70">
           Já tem conta?{" "}
-          <Link href="/login" className="font-medium text-indigo-600 hover:underline">
+          <Link href="/login" className="font-medium text-ink underline">
             Entrar
           </Link>
         </p>

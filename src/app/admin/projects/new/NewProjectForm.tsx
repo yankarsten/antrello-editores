@@ -141,14 +141,14 @@ export default function NewProjectForm({ editors }: { editors: EditorOption[] })
       <div>
         <span className="label">Vídeos brutos</span>
         <UploadDropzone ref={dropzoneRef} multiple />
-        <p className="mt-1.5 text-xs text-zinc-500">
+        <p className="mt-2 text-xs text-ink/60">
           Os arquivos são enviados quando você salva o projeto, com progresso individual por arquivo.
         </p>
       </div>
 
-      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="alert-error">{error}</p>}
 
-      <div className="flex items-center justify-end gap-3 border-t border-zinc-100 pt-4">
+      <div className="flex items-center justify-end gap-3 border-t border-ink/15 pt-5">
         <button type="submit" disabled={busy} className="btn-primary">
           {phase === "creating" && "Criando projeto…"}
           {phase === "uploading" && "Enviando vídeos…"}

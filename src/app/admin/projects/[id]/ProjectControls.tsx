@@ -55,7 +55,7 @@ export default function ProjectControls({
   }
 
   return (
-    <div className="mt-3">
+    <div className="mt-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="assigned-editor" className="label">Editor responsável</label>
@@ -91,8 +91,8 @@ export default function ProjectControls({
           </select>
         </div>
       </div>
-      {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
-      <div className="mt-4 border-t border-zinc-100 pt-4">
+      {error && <p className="alert-error mt-4">{error}</p>}
+      <div className="mt-5 border-t border-ink/15 pt-5">
         <button type="button" onClick={handleDelete} disabled={busy} className="btn-danger !px-3 !py-1.5 text-xs">
           Excluir projeto
         </button>

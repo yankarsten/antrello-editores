@@ -4,8 +4,18 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import StatusBadge from "@/components/StatusBadge";
+import PageHeader from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
+
+interface EditorProject {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  deadline: Date;
+  _count: { sourceVideos: number; deliveryVideos: number };
+}
 
 export default async function EditorDashboardPage() {
   const session = await getSession();
@@ -19,52 +29,86 @@ export default async function EditorDashboardPage() {
     orderBy: { deadline: "asc" },
   });
 
+  // Finished work never competes for attention with the deadline-sorted
+  // active list: it always sits below the divider, newest deadline last.
+  const active = projects.filter((p) => p.status !== "concluido");
+  const done = projects.filter((p) => p.status === "concluido");
+
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-xl font-bold text-zinc-900">Meus projetos</h1>
-      <p className="mt-0.5 text-sm text-zinc-500">
-        Projetos atribuídos a você, ordenados pelo prazo mais próximo.
-      </p>
+      <PageHeader
+        title="Meus projetos"
+        subtitle="Projetos atribuídos a você, ordenados pelo prazo mais próximo."
+      />
 
       {projects.length === 0 ? (
-        <div className="card mt-6 px-6 py-12 text-center">
-          <p className="text-sm font-medium text-zinc-700">Nenhum projeto atribuído a você ainda.</p>
-          <p className="mt-1 text-sm text-zinc-500">
+        <div className="card-empty !py-12">
+          <p className="text-base font-medium text-ink">Nenhum projeto atribuído a você ainda.</p>
+          <p className="mt-2 text-sm text-ink/70">
             Assim que a administração atribuir um projeto, ele aparece aqui.
           </p>
         </div>
       ) : (
-        <ul className="mt-6 space-y-3">
-          {projects.map((project) => (
-            <li key={project.id}>
-              <Link
-                href={`/editor/projects/${project.id}`}
-                className="card block p-4 transition hover:border-indigo-300 hover:shadow-md"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h2 className="text-base font-semibold text-zinc-800">{project.title}</h2>
-                  <StatusBadge status={project.status} />
-                </div>
-                {project.description && (
-                  <p className="mt-1 line-clamp-2 text-sm text-zinc-500">{project.description}</p>
-                )}
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-                  <DeadlineBadge deadline={project.deadline} status={project.status} />
-                  <span>
-                    {project._count.sourceVideos}{" "}
-                    {project._count.sourceVideos === 1 ? "vídeo bruto" : "vídeos brutos"}
-                  </span>
-                  <span>·</span>
-                  <span>
-                    {project._count.deliveryVideos}{" "}
-                    {project._count.deliveryVideos === 1 ? "entrega" : "entregas"}
-                  </span>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <>
+          {active.length === 0 ? (
+            <p className="card-empty">Nenhum projeto em edição no momento.</p>
+          ) : (
+            <ul className="space-y-4">
+              {active.map((project) => (
+                <li key={project.id}>
+                  <ProjectCard project={project} />
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {done.length > 0 && (
+            <>
+              <div className="my-8 flex items-center gap-3">
+                <span className="h-px flex-1 bg-ink" />
+                <span className="chip bg-ink text-white">Concluídos</span>
+                <span className="h-px flex-1 bg-ink" />
+              </div>
+              <ul className="space-y-4">
+                {done.map((project) => (
+                  <li key={project.id}>
+                    <ProjectCard project={project} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </>
       )}
     </div>
+  );
+}
+
+function ProjectCard({ project }: { project: EditorProject }) {
+  return (
+    <Link
+      href={`/editor/projects/${project.id}`}
+      className="card block p-6 transition hover:shadow-hard"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <h2 className="text-lg font-medium text-ink">{project.title}</h2>
+        <StatusBadge status={project.status} />
+      </div>
+      {project.description && (
+        <p className="mt-2 line-clamp-2 text-sm text-ink/70">{project.description}</p>
+      )}
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-ink/60">
+        <DeadlineBadge deadline={project.deadline} status={project.status} />
+        <span>
+          {project._count.sourceVideos}{" "}
+          {project._count.sourceVideos === 1 ? "vídeo bruto" : "vídeos brutos"}
+        </span>
+        <span>·</span>
+        <span>
+          {project._count.deliveryVideos}{" "}
+          {project._count.deliveryVideos === 1 ? "entrega" : "entregas"}
+        </span>
+      </div>
+    </Link>
   );
 }

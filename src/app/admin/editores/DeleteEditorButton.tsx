@@ -61,7 +61,7 @@ export default function DeleteEditorButton({
       >
         {busy ? "Excluindo…" : "Excluir"}
       </button>
-      {error && <span className="text-xs text-red-600">{error}</span>}
+      {error && <span className="text-xs font-medium text-red-600">{error}</span>}
     </div>
   );
 }

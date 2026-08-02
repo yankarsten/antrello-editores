@@ -4,30 +4,68 @@
 
 @layer base {
   body {
-    @apply bg-zinc-100 text-zinc-900 antialiased;
+    @apply bg-white text-ink antialiased;
   }
 }
 
 @layer components {
+  /* --------------------------------------------------------------- controls */
+
   .input {
-    @apply w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20;
+    @apply w-full rounded-control border border-ink bg-white px-4 py-2.5 text-sm text-ink placeholder-muted outline-none transition focus:ring-4 focus:ring-accent/70;
   }
   .label {
-    @apply mb-1.5 block text-sm font-medium text-zinc-700;
+    @apply mb-1.5 block text-sm font-medium text-ink;
   }
+
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-indigo-500/40 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-control px-5 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-4 focus:ring-accent/70 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-indigo-600 text-white shadow-sm hover:bg-indigo-500;
+    @apply btn bg-ink text-white hover:bg-black;
   }
   .btn-secondary {
-    @apply btn border border-zinc-300 bg-white text-zinc-700 shadow-sm hover:bg-zinc-50;
+    @apply btn border border-ink bg-white text-ink hover:bg-ink hover:text-white;
+  }
+  .btn-accent {
+    @apply btn border border-ink bg-accent text-ink hover:bg-accent-dark;
   }
   .btn-danger {
-    @apply btn border border-red-200 bg-white text-red-600 shadow-sm hover:bg-red-50;
+    @apply btn border border-ink bg-white text-red-600 hover:border-red-600 hover:bg-red-600 hover:text-white;
   }
+
+  /* --------------------------------------------------------------- surfaces */
+
   .card {
-    @apply rounded-xl border border-zinc-200 bg-white shadow-sm;
+    @apply rounded-panel border border-ink bg-white;
+  }
+  .card-mist {
+    @apply rounded-panel border border-ink bg-mist;
+  }
+  .card-ink {
+    @apply rounded-panel border border-ink bg-ink text-white;
+  }
+  /* Dashed placeholder surface — empty states and drop targets. */
+  .card-empty {
+    @apply rounded-panel border border-dashed border-ink bg-mist px-4 py-8 text-center text-sm text-ink/70;
+  }
+
+  /* The signature accent highlight sitting behind a run of heading text. */
+  .pill {
+    @apply inline-block rounded-[7px] bg-accent px-2 text-ink;
+  }
+
+  /* Flat bordered chip — statuses, deadlines, tags. */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-ink px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  /* ----------------------------------------------------------------- alerts */
+
+  .alert-error {
+    @apply rounded-control border border-red-600 bg-red-50 px-4 py-2.5 text-sm text-red-700;
+  }
+  .alert-success {
+    @apply rounded-control border border-ink bg-accent px-4 py-2.5 text-sm text-ink;
   }
 }

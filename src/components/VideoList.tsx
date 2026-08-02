@@ -18,13 +18,11 @@ function VideoRow({ video }: { video: VideoItem }) {
   const src = `/api/videos/${video.type}/${video.id}`;
 
   return (
-    <li className="rounded-lg border border-zinc-200 bg-white">
+    <li className="overflow-hidden rounded-control border border-ink bg-white">
       <div className="flex flex-wrap items-center gap-3 px-4 py-3">
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-zinc-800">
-            {video.label ?? video.fileName}
-          </p>
-          <p className="mt-0.5 truncate text-xs text-zinc-500">
+          <p className="truncate text-sm font-medium text-ink">{video.label ?? video.fileName}</p>
+          <p className="mt-0.5 truncate text-xs text-ink/60">
             {video.label && <span>{video.fileName} · </span>}
             {formatFileSize(video.size)}
             {video.uploaderName && <span> · enviado por {video.uploaderName}</span>}
@@ -35,14 +33,13 @@ function VideoRow({ video }: { video: VideoItem }) {
           <button type="button" onClick={() => setPlaying((p) => !p)} className="btn-secondary !px-3 !py-1.5 text-xs">
             {playing ? "Fechar" : "Assistir"}
           </button>
-          <a href={`${src}?download=1`} className="btn-secondary !px-3 !py-1.5 text-xs" download>
+          <a href={`${src}?download=1`} className="btn-accent !px-3 !py-1.5 text-xs" download>
             Baixar
           </a>
         </div>
       </div>
       {playing && (
-        <div className="border-t border-zinc-200 bg-black">
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <div className="border-t border-ink bg-ink">
           <video src={src} controls autoPlay className="mx-auto max-h-[420px] w-full" />
         </div>
       )}
@@ -52,11 +49,7 @@ function VideoRow({ video }: { video: VideoItem }) {
 
 export default function VideoList({ videos, emptyText }: { videos: VideoItem[]; emptyText: string }) {
   if (videos.length === 0) {
-    return (
-      <p className="rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-4 py-6 text-center text-sm text-zinc-500">
-        {emptyText}
-      </p>
-    );
+    return <p className="card-empty">{emptyText}</p>;
   }
   return (
     <ul className="space-y-2">

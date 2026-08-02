@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { DEFAULT_STATUS } from "@/lib/constants";
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       description: description || null,
       notes: notes || null,
       deadline,
-      status: assignedEditorId ? "em_edicao" : "novo",
+      status: DEFAULT_STATUS,
       assignedEditorId,
       createdById: session.userId,
     },

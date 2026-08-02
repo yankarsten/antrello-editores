@@ -9,6 +9,7 @@ import {
   type DropResult,
 } from "@hello-pangea/dnd";
 import { STATUSES, STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
+import { STATUS_FILL } from "@/lib/status-ui";
 import DeadlineBadge from "@/components/DeadlineBadge";
 
 export interface BoardProject {
@@ -19,13 +20,6 @@ export interface BoardProject {
   editorName: string | null;
   deliveryCount: number;
 }
-
-const COLUMN_ACCENT: Record<ProjectStatus, string> = {
-  novo: "border-t-sky-400",
-  em_edicao: "border-t-violet-400",
-  em_revisao: "border-t-amber-400",
-  concluido: "border-t-emerald-400",
-};
 
 export default function KanbanBoard({ initialProjects }: { initialProjects: BoardProject[] }) {
   const [projects, setProjects] = useState(initialProjects);
@@ -67,34 +61,28 @@ export default function KanbanBoard({ initialProjects }: { initialProjects: Boar
 
   return (
     <div>
-      {error && (
-        <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
-      )}
+      {error && <p className="alert-error mb-4">{error}</p>}
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           {STATUSES.map((status) => {
             const cards = projects.filter((p) => p.status === status);
             return (
-              <div key={status} className={`card border-t-4 ${COLUMN_ACCENT[status]} flex min-h-[280px] flex-col`}>
-                <div className="flex items-center justify-between px-4 pb-2 pt-3">
-                  <h2 className="text-sm font-semibold text-zinc-700">{STATUS_LABELS[status]}</h2>
-                  <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500">
-                    {cards.length}
-                  </span>
+              <div key={status} className="card-mist flex min-h-[300px] flex-col">
+                <div className="flex items-center justify-between gap-2 px-5 pb-3 pt-5">
+                  <h2 className={`chip ${STATUS_FILL[status]}`}>{STATUS_LABELS[status]}</h2>
+                  <span className="text-sm font-medium text-ink/60">{cards.length}</span>
                 </div>
                 <Droppable droppableId={status}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`flex-1 space-y-2 px-3 pb-3 transition-colors ${
-                        snapshot.isDraggingOver ? "rounded-b-xl bg-indigo-50/70" : ""
+                      className={`flex-1 space-y-3 px-4 pb-5 transition-colors ${
+                        snapshot.isDraggingOver ? "rounded-b-panel bg-accent/50" : ""
                       }`}
                     >
                       {cards.length === 0 && !snapshot.isDraggingOver && (
-                        <p className="px-1 py-4 text-center text-xs text-zinc-400">
-                          Nenhum projeto aqui.
-                        </p>
+                        <p className="px-1 py-6 text-center text-xs text-ink/50">Nenhum projeto aqui.</p>
                       )}
                       {cards.map((project, index) => (
                         <Draggable key={project.id} draggableId={project.id} index={index}>
@@ -103,17 +91,17 @@ export default function KanbanBoard({ initialProjects }: { initialProjects: Boar
                               ref={dragProvided.innerRef}
                               {...dragProvided.draggableProps}
                               {...dragProvided.dragHandleProps}
-                              className={`rounded-lg border border-zinc-200 bg-white p-3 shadow-sm transition-shadow ${
-                                dragSnapshot.isDragging ? "shadow-lg ring-2 ring-indigo-400" : "hover:shadow"
+                              className={`rounded-control border border-ink bg-white p-4 transition-shadow ${
+                                dragSnapshot.isDragging ? "shadow-hard" : "hover:shadow-hard-sm"
                               }`}
                             >
                               <Link
                                 href={`/admin/projects/${project.id}`}
-                                className="block text-sm font-semibold text-zinc-800 hover:text-indigo-600"
+                                className="block text-sm font-medium text-ink hover:underline"
                               >
                                 {project.title}
                               </Link>
-                              <p className="mt-1 text-xs text-zinc-500">
+                              <p className="mt-1 text-xs text-ink/60">
                                 {project.editorName ?? "Sem editor atribuído"}
                                 {project.deliveryCount > 0 && (
                                   <span>
@@ -123,7 +111,7 @@ export default function KanbanBoard({ initialProjects }: { initialProjects: Boar
                                   </span>
                                 )}
                               </p>
-                              <div className="mt-2">
+                              <div className="mt-3">
                                 <DeadlineBadge deadline={project.deadline} status={project.status} showRelative={false} />
                               </div>
                             </div>

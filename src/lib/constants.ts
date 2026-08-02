@@ -1,11 +1,12 @@
-export const STATUSES = ["novo", "em_edicao", "em_revisao", "concluido"] as const;
+export const STATUSES = ["em_edicao", "concluido"] as const;
 
 export type ProjectStatus = (typeof STATUSES)[number];
 
+/** Status assumed for a new project and for any unrecognised stored value. */
+export const DEFAULT_STATUS: ProjectStatus = "em_edicao";
+
 export const STATUS_LABELS: Record<ProjectStatus, string> = {
-  novo: "Novo",
   em_edicao: "Em edição",
-  em_revisao: "Em revisão",
   concluido: "Concluído",
 };
 

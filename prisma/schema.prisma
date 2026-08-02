@@ -24,14 +24,14 @@ model User {
   deliveryVideos   DeliveryVideo[]
 }
 
-// status: "novo" | "em_edicao" | "em_revisao" | "concluido"
+// status: "em_edicao" | "concluido"
 model Project {
   id               String   @id @default(cuid())
   title            String
   description      String?
   notes            String?
   deadline         DateTime
-  status           String   @default("novo")
+  status           String   @default("em_edicao")
   assignedEditorId String?
   createdById      String
   createdAt        DateTime @default(now())

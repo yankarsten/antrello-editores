@@ -4,6 +4,7 @@ import ProjectCalendar, {
   type CalendarEditor,
   type CalendarProject,
 } from "@/components/ProjectCalendar";
+import PageHeader from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -37,12 +38,10 @@ export default async function CalendarPage() {
 
   return (
     <div>
-      <div className="mb-5">
-        <h1 className="text-xl font-bold text-zinc-900">Calendário</h1>
-        <p className="mt-0.5 text-sm text-zinc-500">
-          Entregas de todos os projetos por data de prazo. Clique em um dia para ver os detalhes.
-        </p>
-      </div>
+      <PageHeader
+        title="Calendário"
+        subtitle="Entregas de todos os projetos por data de prazo. Clique em um dia para ver os detalhes."
+      />
       {/* todayKey comes from the server so the "hoje" highlight can't drift
           between server and client render. */}
       <ProjectCalendar

@@ -52,11 +52,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     },
   });
 
-  // A new delivery puts the project under review; manual dragging on the
-  // board can still override this afterwards.
-  if (project.status !== "concluido") {
-    await db.project.update({ where: { id }, data: { status: "em_revisao" } });
-  }
-
   return NextResponse.json({ id: video.id }, { status: 201 });
 }

@@ -50,7 +50,7 @@ async function main() {
           title: "Institucional Café Bravo",
           description: "Vídeo institucional de 2 minutos para o site da marca. Cortes dinâmicos, trilha animada.",
           deadline: daysFromNow(12),
-          status: "novo",
+          status: "em_edicao",
           createdById: admin.id,
         },
         {
@@ -73,7 +73,7 @@ async function main() {
           title: "Tutorial App Finanças",
           description: "Série de 3 vídeos curtos de onboarding do aplicativo.",
           deadline: daysFromNow(6),
-          status: "em_revisao",
+          status: "em_edicao",
           assignedEditorId: editors[2].id,
           createdById: admin.id,
         },

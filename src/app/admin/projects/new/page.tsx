@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import PageHeader from "@/components/PageHeader";
 import NewProjectForm from "./NewProjectForm";
 
 export const dynamic = "force-dynamic";
@@ -12,11 +13,11 @@ export default async function NewProjectPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-xl font-bold text-zinc-900">Novo projeto</h1>
-      <p className="mt-0.5 text-sm text-zinc-500">
-        Preencha os dados do projeto e envie os vídeos brutos para o editor trabalhar.
-      </p>
-      <div className="card mt-5 p-6">
+      <PageHeader
+        title="Novo projeto"
+        subtitle="Preencha os dados do projeto e envie os vídeos brutos para o editor trabalhar."
+      />
+      <div className="rounded-card border border-ink bg-white p-8 shadow-hard">
         <NewProjectForm editors={editors} />
       </div>
     </div>
