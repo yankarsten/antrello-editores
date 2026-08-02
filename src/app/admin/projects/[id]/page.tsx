@@ -4,6 +4,7 @@ import DeadlineBadge from "@/components/DeadlineBadge";
 import StatusBadge from "@/components/StatusBadge";
 import VideoList, { type VideoItem } from "@/components/VideoList";
 import ProjectControls from "./ProjectControls";
+import ProjectNotes from "./ProjectNotes";
 import AddSourceVideos from "./AddSourceVideos";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +42,7 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
     size: v.size,
     uploadedAt: v.uploadedAt.toISOString(),
     label: v.label,
-    uploaderName: v.uploadedBy.name,
+    uploaderName: v.uploadedBy?.name ?? "Editor removido",
   }));
 
   return (
@@ -59,6 +60,8 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
       {project.description && (
         <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-600">{project.description}</p>
       )}
+
+      <ProjectNotes projectId={project.id} initialNotes={project.notes ?? ""} />
 
       <div className="card mt-6 p-5">
         <h2 className="text-sm font-semibold text-zinc-700">Gerenciar projeto</h2>

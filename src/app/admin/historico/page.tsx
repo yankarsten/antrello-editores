@@ -52,7 +52,7 @@ export default async function HistoryPage() {
       uploadedAt: v.uploadedAt,
       projectId: v.project.id,
       projectTitle: v.project.title,
-      uploaderName: v.uploadedBy.name,
+      uploaderName: v.uploadedBy?.name ?? "Editor removido",
     })),
   ].sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
 

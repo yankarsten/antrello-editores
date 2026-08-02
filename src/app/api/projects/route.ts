@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const title = typeof body?.title === "string" ? body.title.trim() : "";
   const description = typeof body?.description === "string" ? body.description.trim() : "";
+  const notes = typeof body?.notes === "string" ? body.notes.trim() : "";
   const deadlineRaw = typeof body?.deadline === "string" ? body.deadline : "";
   const assignedEditorId = typeof body?.assignedEditorId === "string" && body.assignedEditorId ? body.assignedEditorId : null;
 
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
     data: {
       title,
       description: description || null,
+      notes: notes || null,
       deadline,
       status: assignedEditorId ? "em_edicao" : "novo",
       assignedEditorId,

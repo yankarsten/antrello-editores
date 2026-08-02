@@ -14,8 +14,20 @@ const dateTimeFormatter = new Intl.DateTimeFormat("pt-BR", {
   timeZone: "America/Sao_Paulo",
 });
 
+const dayKeyFormatter = new Intl.DateTimeFormat("en-CA", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  timeZone: "America/Sao_Paulo",
+});
+
 export function formatDate(date: Date | string): string {
   return dateFormatter.format(new Date(date));
+}
+
+/** "YYYY-MM-DD" in the app's timezone — used to bucket items into calendar days. */
+export function dayKey(date: Date | string): string {
+  return dayKeyFormatter.format(new Date(date));
 }
 
 export function formatDateTime(date: Date | string): string {

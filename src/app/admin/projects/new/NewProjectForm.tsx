@@ -11,6 +11,7 @@ interface EditorOption {
 export default function NewProjectForm({ editors }: { editors: EditorOption[] }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [notes, setNotes] = useState("");
   const [deadline, setDeadline] = useState("");
   const [assignedEditorId, setAssignedEditorId] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +34,7 @@ export default function NewProjectForm({ editors }: { editors: EditorOption[] })
         body: JSON.stringify({
           title,
           description,
+          notes,
           deadline,
           assignedEditorId: assignedEditorId || null,
         }),
@@ -87,6 +89,19 @@ export default function NewProjectForm({ editors }: { editors: EditorOption[] })
           placeholder="Briefing, referências, duração esperada…"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          disabled={busy}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="notes" className="label">Observações</label>
+        <textarea
+          id="notes"
+          rows={3}
+          className="input resize-y"
+          placeholder="Anotações internas, ajustes pedidos pelo cliente, pontos de atenção…"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
           disabled={busy}
         />
       </div>

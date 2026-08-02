@@ -29,6 +29,7 @@ model Project {
   id               String   @id @default(cuid())
   title            String
   description      String?
+  notes            String?
   deadline         DateTime
   status           String   @default("novo")
   assignedEditorId String?
@@ -57,7 +58,9 @@ model SourceVideo {
 model DeliveryVideo {
   id           String   @id @default(cuid())
   projectId    String
-  uploadedById String
+  // Nullable so removing an editor's account keeps the delivered videos, which
+  // belong to the project rather than to the person who uploaded them.
+  uploadedById String?
   label        String   @default("Vídeo Final")
   fileName     String
   storedName   String
@@ -65,5 +68,5 @@ model DeliveryVideo {
   uploadedAt   DateTime @default(now())
 
   project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  uploadedBy User    @relation(fields: [uploadedById], references: [id])
+  uploadedBy User?   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
 }

@@ -15,7 +15,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (!project) return NextResponse.json({ error: "Projeto não encontrado." }, { status: 404 });
 
   const body = await request.json().catch(() => null);
-  const data: { status?: string; assignedEditorId?: string | null } = {};
+  const data: { status?: string; assignedEditorId?: string | null; notes?: string | null } = {};
 
   if (body && "status" in body) {
     if (typeof body.status !== "string" || !isProjectStatus(body.status)) {
@@ -36,6 +36,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (!data.status && project.status === "novo") data.status = "em_edicao";
     } else {
       return NextResponse.json({ error: "Editor inválido." }, { status: 400 });
+    }
+  }
+
+  if (body && "notes" in body) {
+    if (body.notes === null) {
+      data.notes = null;
+    } else if (typeof body.notes === "string") {
+      data.notes = body.notes.trim() || null;
+    } else {
+      return NextResponse.json({ error: "Observações inválidas." }, { status: 400 });
     }
   }
 

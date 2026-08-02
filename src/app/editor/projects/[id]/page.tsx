@@ -38,7 +38,7 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
     size: v.size,
     uploadedAt: v.uploadedAt.toISOString(),
     label: v.label,
-    uploaderName: v.uploadedBy.name,
+    uploaderName: v.uploadedBy?.name ?? "Editor removido",
   }));
 
   const suggestedLabel =
@@ -56,11 +56,29 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
         <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-600">{project.description}</p>
       )}
 
+      {project.notes && (
+        <div className="card mt-4 p-5">
+          <h2 className="text-sm font-semibold text-zinc-700">Observações</h2>
+          <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-zinc-600">{project.notes}</p>
+        </div>
+      )}
+
       <section className="mt-8">
-        <h2 className="mb-3 text-base font-semibold text-zinc-800">
-          Vídeos brutos{" "}
-          <span className="text-sm font-normal text-zinc-400">({sourceItems.length})</span>
-        </h2>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-base font-semibold text-zinc-800">
+            Vídeos brutos{" "}
+            <span className="text-sm font-normal text-zinc-400">({sourceItems.length})</span>
+          </h2>
+          {sourceItems.length > 0 && (
+            <a
+              href={`/api/projects/${project.id}/source-videos/zip`}
+              className="btn-secondary !px-3 !py-1.5 text-xs"
+              download
+            >
+              Baixar todos (.zip)
+            </a>
+          )}
+        </div>
         <VideoList
           videos={sourceItems}
           emptyText="A administração ainda não enviou os vídeos brutos deste projeto."

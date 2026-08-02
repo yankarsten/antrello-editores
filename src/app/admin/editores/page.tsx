@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { formatDate } from "@/lib/format";
+import DeleteEditorButton from "./DeleteEditorButton";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,7 @@ export default async function EditorsPage() {
                 <th className="px-4 py-3 font-medium">Concluídos</th>
                 <th className="px-4 py-3 font-medium">Entregas</th>
                 <th className="px-4 py-3 font-medium">Cadastro</th>
+                <th className="px-4 py-3 text-right font-medium">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -49,6 +51,14 @@ export default async function EditorsPage() {
                     <td className="px-4 py-3 text-zinc-700">{done}</td>
                     <td className="px-4 py-3 text-zinc-700">{editor._count.deliveryVideos}</td>
                     <td className="px-4 py-3 text-zinc-500">{formatDate(editor.createdAt)}</td>
+                    <td className="px-4 py-3">
+                      <DeleteEditorButton
+                        editorId={editor.id}
+                        editorName={editor.name}
+                        activeProjects={active}
+                        deliveries={editor._count.deliveryVideos}
+                      />
+                    </td>
                   </tr>
                 );
               })}
