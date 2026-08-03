@@ -24,6 +24,16 @@ else
   exit 1
 fi
 
+
+# The SQLite DB lives on the named volume "db-data" (see docker-compose.yml),
+# which `up -d --build` never touches — only `down -v` or `volume rm` would.
+# Report which case this run is, so data loss is obvious if it ever happens.
+if docker volume ls -q 2>/dev/null | grep -q "db-data$"; then
+  echo "==> Existing database volume found — data will be preserved."
+else
+  echo "==> No existing database volume — a fresh one will be created (first boot)."
+fi
+
 echo "==> Building and (re)starting the container..."
 $COMPOSE up -d --build
 
