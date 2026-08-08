@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -17,7 +16,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, password }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -45,16 +44,16 @@ export default function LoginPage() {
           <h2 className="mb-6 text-2xl font-medium">Entrar</h2>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="label">E-mail</label>
+              <label htmlFor="name" className="label">Nome</label>
               <input
-                id="email"
-                type="email"
+                id="name"
+                type="text"
                 required
-                autoComplete="email"
+                autoComplete="username"
                 className="input"
-                placeholder="voce@exemplo.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Seu nome"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div>
@@ -77,10 +76,7 @@ export default function LoginPage() {
           </div>
         </form>
         <p className="mt-6 text-center text-sm text-ink/70">
-          É editor(a) e ainda não tem conta?{" "}
-          <Link href="/register" className="font-medium text-ink underline">
-            Cadastre-se
-          </Link>
+          O acesso é criado pela administração. Peça o seu link de acesso para receber uma conta.
         </p>
       </div>
     </main>

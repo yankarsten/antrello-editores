@@ -20,12 +20,22 @@ Acesse http://localhost:3000.
 
 **Contas de teste (seed):**
 
-| Papel  | E-mail               | Senha      |
-| ------ | -------------------- | ---------- |
-| Admin  | `admin@antrello.com` | `admin123` |
-| Editor | `marina@antrello.com` (e outros) | `editor123` |
+| Papel  | Nome (login)                | Senha       |
+| ------ | --------------------------- | ----------- |
+| Admin  | `Administrador`             | `admin123`  |
+| Editor | `Marina Duarte` (e outros)  | `editor123` |
 
-Editores também podem se cadastrar em `/register`. Contas de admin são criadas apenas pelo seed (`ADMIN_EMAIL`/`ADMIN_PASSWORD` no `.env`).
+## Acesso
+
+Não existe e-mail nem cadastro público: o login é **nome + senha**, e a única forma de criar uma conta é por um link de acesso.
+
+1. Em `/admin/editores`, o admin informa **apenas o nome** e gera um link (`/convite/<token>`), válido por 7 dias.
+2. A pessoa abre o link e define a própria senha — a conta é criada nesse momento e ela já entra logada.
+3. O link é de uso único. Se for perdido, o admin gera um novo (o anterior deixa de valer) ou revoga o convite.
+
+O banco guarda só o SHA-256 do token, então o link completo aparece uma única vez, logo depois de ser gerado. O nome é normalizado (minúsculas, espaços colapsados) para o índice único, então não dá para ter duas contas "Marina Duarte" e "marina duarte".
+
+A conta de admin é criada apenas pelo seed (`ADMIN_NAME`/`ADMIN_PASSWORD` no `.env`).
 
 ## Uploads
 

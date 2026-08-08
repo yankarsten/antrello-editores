@@ -11,10 +11,14 @@ datasource db {
 }
 
 // role: "admin" | "editor" (SQLite has no native enums)
+//
+// The name is the login identifier — there are no e-mail addresses. `nameKey`
+// holds the normalized form (see lib/users.ts) and carries the unique index, so
+// "Marina Duarte" and "marina duarte" can never be two different accounts.
 model User {
   id           String   @id @default(cuid())
   name         String
-  email        String   @unique
+  nameKey      String   @unique
   passwordHash String
   role         String   @default("editor")
   createdAt    DateTime @default(now())
@@ -22,6 +26,30 @@ model User {
   projectsCreated  Project[]       @relation("ProjectCreatedBy")
   projectsAssigned Project[]       @relation("ProjectAssignedEditor")
   deliveryVideos   DeliveryVideo[]
+  invitesCreated   Invite[]        @relation("InviteCreatedBy")
+  invite           Invite?         @relation("InviteAcceptedBy")
+}
+
+// A single-use access link created by an admin. Accounts exist only through one
+// of these: the invitee opens the link and picks their own password.
+//
+// Only the SHA-256 of the token is stored, so a copy of the database cannot be
+// turned into working invite links. The admin can regenerate a link (new token)
+// if the original is lost.
+model Invite {
+  id          String    @id @default(cuid())
+  name        String
+  nameKey     String    @unique
+  tokenHash   String    @unique
+  role        String    @default("editor")
+  createdById String
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  acceptedById String?  @unique
+
+  createdBy  User  @relation("InviteCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  acceptedBy User? @relation("InviteAcceptedBy", fields: [acceptedById], references: [id], onDelete: Cascade)
 }
 
 // status: "em_edicao" | "concluido"

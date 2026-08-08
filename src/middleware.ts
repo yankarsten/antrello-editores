@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
 
   const home = session ? (session.role === "admin" ? "/admin" : "/editor") : null;
 
-  if (pathname === "/login" || pathname === "/register") {
+  if (pathname === "/login") {
     if (home) return NextResponse.redirect(new URL(home, request.url));
     return NextResponse.next();
   }
@@ -34,5 +34,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/register", "/admin/:path*", "/editor/:path*"],
+  // `/convite/:token` is deliberately absent: it is the one public entry point
+  // for people who do not have an account yet.
+  matcher: ["/", "/login", "/admin/:path*", "/editor/:path*"],
 };

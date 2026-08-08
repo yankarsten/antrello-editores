@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { normalizeName } from "../src/lib/users";
 
 const db = new PrismaClient();
 
@@ -11,34 +12,30 @@ function daysFromNow(days: number): Date {
 }
 
 async function main() {
-  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@antrello.com";
   const adminPassword = process.env.ADMIN_PASSWORD ?? "admin123";
   const adminName = process.env.ADMIN_NAME ?? "Administrador";
 
+  // The admin is the only account not created through an invite link — someone
+  // has to be able to issue the first one.
   const admin = await db.user.upsert({
-    where: { email: adminEmail },
+    where: { nameKey: normalizeName(adminName) },
     update: {},
     create: {
       name: adminName,
-      email: adminEmail,
+      nameKey: normalizeName(adminName),
       passwordHash: await bcrypt.hash(adminPassword, 10),
       role: "admin",
     },
   });
 
   const editorPassword = await bcrypt.hash("editor123", 10);
-  const editorsData = [
-    { name: "Marina Duarte", email: "marina@antrello.com" },
-    { name: "Rafael Pontes", email: "rafael@antrello.com" },
-    { name: "Camila Serra", email: "camila@antrello.com" },
-  ];
   const editors = [];
-  for (const e of editorsData) {
+  for (const name of ["Marina Duarte", "Rafael Pontes", "Camila Serra"]) {
     editors.push(
       await db.user.upsert({
-        where: { email: e.email },
+        where: { nameKey: normalizeName(name) },
         update: {},
-        create: { ...e, passwordHash: editorPassword, role: "editor" },
+        create: { name, nameKey: normalizeName(name), passwordHash: editorPassword, role: "editor" },
       })
     );
   }
@@ -88,7 +85,7 @@ async function main() {
     });
   }
 
-  console.log(`Seed ok — admin: ${adminEmail} / ${adminPassword}; editores: editor123`);
+  console.log(`Seed ok — admin: "${adminName}" / ${adminPassword}; editores: editor123`);
 }
 
 main()

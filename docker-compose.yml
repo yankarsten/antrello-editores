@@ -15,9 +15,11 @@ services:
       # CHANGE THIS in production — signs the session JWTs.
       AUTH_SECRET: "${AUTH_SECRET:-change-me-in-production-please}"
       # Seed admin account (created by prisma db seed on first boot).
-      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@antrello.com}"
+      # ADMIN_NAME is the login — there are no e-mail addresses.
       ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin123}"
       ADMIN_NAME: "${ADMIN_NAME:-Administrador}"
+      # Public URL used to build the invite links (falls back to request host).
+      APP_URL: "${APP_URL:-}"
     volumes:
       - db-data:/app/data
       - video-storage:/app/storage
