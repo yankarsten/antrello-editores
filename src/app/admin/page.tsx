@@ -35,7 +35,7 @@ export default async function AdminBoardPage() {
     <div>
       <PageHeader
         title="Quadro de projetos"
-        subtitle="Arraste os cartões para atualizar o status de cada projeto. Use o + de uma coluna para criar um projeto já nela."
+        subtitle="Arraste os cartões para atualizar o status de cada projeto. Use o + em Em edição para criar um projeto."
       />
       <KanbanBoard
         initialProjects={boardProjects}

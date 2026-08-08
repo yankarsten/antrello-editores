@@ -8,7 +8,7 @@ import {
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd";
-import { STATUSES, STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
+import { DEFAULT_STATUS, STATUSES, STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
 import { STATUS_FILL } from "@/lib/status-ui";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import NewProjectDialog from "@/components/NewProjectDialog";
@@ -88,11 +88,13 @@ export default function KanbanBoard({
                   <h2 className={`chip ${STATUS_FILL[status]}`}>{STATUS_LABELS[status]}</h2>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-ink/60">{cards.length}</span>
-                    {canCreate && (
+                    {/* Only the starting column creates projects — nothing is
+                        born already delivered. */}
+                    {canCreate && status === DEFAULT_STATUS && (
                       <button
                         type="button"
                         onClick={() => setNewIn(status)}
-                        title={`Novo projeto em ${STATUS_LABELS[status]}`}
+                        title="Novo projeto"
                         aria-label={`Novo projeto em ${STATUS_LABELS[status]}`}
                         className="flex h-7 w-7 items-center justify-center rounded-full border border-ink bg-white transition hover:bg-accent focus:outline-none focus:ring-4 focus:ring-accent/70"
                       >
