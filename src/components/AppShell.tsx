@@ -6,7 +6,6 @@ const NAV_LINKS: Record<string, { href: string; label: string }[]> = {
   admin: [
     { href: "/admin", label: "Quadro" },
     { href: "/admin/calendario", label: "Calendário" },
-    { href: "/admin/projects/new", label: "Novo projeto" },
     { href: "/admin/editores", label: "Editores" },
   ],
   editor: [{ href: "/editor", label: "Meus projetos" }],

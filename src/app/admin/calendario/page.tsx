@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 import { dayKey } from "@/lib/format";
 import ProjectCalendar, {
   type CalendarEditor,
@@ -9,6 +10,7 @@ import PageHeader from "@/components/PageHeader";
 export const dynamic = "force-dynamic";
 
 export default async function CalendarPage() {
+  const session = await getSession();
   const [projects, editors] = await Promise.all([
     db.project.findMany({
       include: {
@@ -40,7 +42,7 @@ export default async function CalendarPage() {
     <div>
       <PageHeader
         title="Calendário"
-        subtitle="Entregas de todos os projetos por data de prazo. Clique em um dia para ver os detalhes."
+        subtitle="Entregas de todos os projetos por data de prazo. Clique em um dia para ver os detalhes ou use o + do dia para criar um projeto com esse prazo."
       />
       {/* todayKey comes from the server so the "hoje" highlight can't drift
           between server and client render. */}
@@ -48,6 +50,7 @@ export default async function CalendarPage() {
         projects={calendarProjects}
         editors={calendarEditors}
         todayKey={dayKey(new Date())}
+        canCreate={session?.role === "admin"}
       />
     </div>
   );

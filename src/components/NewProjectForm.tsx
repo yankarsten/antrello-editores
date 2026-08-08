@@ -2,17 +2,32 @@
 
 import { useRef, useState } from "react";
 import UploadDropzone, { type UploadDropzoneHandle } from "@/components/UploadDropzone";
+import type { ProjectStatus } from "@/lib/constants";
 
-interface EditorOption {
+export interface EditorOption {
   id: string;
   name: string;
 }
 
-export default function NewProjectForm({ editors }: { editors: EditorOption[] }) {
+export default function NewProjectForm({
+  editors,
+  status,
+  defaultDeadline = "",
+  onCreated,
+  onCancel,
+}: {
+  editors: EditorOption[];
+  /** Column the project is created in; the server falls back to the default. */
+  status?: ProjectStatus;
+  /** "YYYY-MM-DD" prefilled when creating from a calendar day. */
+  defaultDeadline?: string;
+  onCreated: (projectId: string) => void;
+  onCancel?: () => void;
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [notes, setNotes] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [deadline, setDeadline] = useState(defaultDeadline);
   const [assignedEditorId, setAssignedEditorId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"idle" | "creating" | "uploading">("idle");
@@ -36,6 +51,7 @@ export default function NewProjectForm({ editors }: { editors: EditorOption[] })
           description,
           notes,
           deadline,
+          status,
           assignedEditorId: assignedEditorId || null,
         }),
       }).catch(() => null);
@@ -59,7 +75,7 @@ export default function NewProjectForm({ editors }: { editors: EditorOption[] })
       }
     }
 
-    window.location.href = `/admin/projects/${projectId}`;
+    onCreated(projectId);
   }
 
   const busy = phase !== "idle";
@@ -72,6 +88,7 @@ export default function NewProjectForm({ editors }: { editors: EditorOption[] })
           id="title"
           type="text"
           required
+          autoFocus
           className="input"
           placeholder="Ex.: Institucional Café Bravo"
           value={title}
@@ -149,6 +166,11 @@ export default function NewProjectForm({ editors }: { editors: EditorOption[] })
       {error && <p className="alert-error">{error}</p>}
 
       <div className="flex items-center justify-end gap-3 border-t border-ink/15 pt-5">
+        {onCancel && (
+          <button type="button" onClick={onCancel} disabled={busy} className="btn-secondary">
+            Cancelar
+          </button>
+        )}
         <button type="submit" disabled={busy} className="btn-primary">
           {phase === "creating" && "Criando projeto…"}
           {phase === "uploading" && "Enviando vídeos…"}

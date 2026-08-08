@@ -5,6 +5,7 @@ import Link from "next/link";
 import { DEFAULT_STATUS, STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
 import { STATUS_CHIP, STATUS_DOT } from "@/lib/status-ui";
 import { formatDate } from "@/lib/format";
+import NewProjectDialog from "@/components/NewProjectDialog";
 
 export interface CalendarProject {
   id: string;
@@ -57,16 +58,20 @@ export default function ProjectCalendar({
   projects,
   editors,
   todayKey,
+  canCreate = false,
 }: {
   projects: CalendarProject[];
   editors: CalendarEditor[];
   todayKey: string;
+  /** Admins only: shows the per-day "+" that creates a project. */
+  canCreate?: boolean;
 }) {
   const [year, setYear] = useState(() => Number(todayKey.slice(0, 4)));
   const [month, setMonth] = useState(() => Number(todayKey.slice(5, 7)) - 1);
   const [editorFilter, setEditorFilter] = useState("all");
   const [hideDone, setHideDone] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [newOnDay, setNewOnDay] = useState<string | null>(null);
 
   const visible = useMemo(
     () =>
@@ -184,48 +189,65 @@ export default function ProjectCalendar({
                 const shown = dayProjects.slice(0, 3);
 
                 return (
-                  <button
-                    type="button"
-                    key={key}
-                    onClick={() => setSelectedDay(isSelected ? null : key)}
-                    className={`flex min-h-[6.5rem] flex-col gap-1 p-1.5 text-left transition ${
-                      inMonth ? "bg-white" : "bg-mist"
-                    } ${isSelected ? "ring-2 ring-inset ring-ink" : "hover:bg-accent/40"}`}
-                  >
-                    <span
-                      className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
-                        isToday
-                          ? "bg-ink font-medium text-white"
-                          : inMonth
-                            ? "text-ink"
-                            : "text-ink/40"
+                  // The "+" has to sit beside the day button, not inside it —
+                  // hence the wrapper that carries the cell's background.
+                  <div key={key} className={`group relative ${inMonth ? "bg-white" : "bg-mist"}`}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDay(isSelected ? null : key)}
+                      className={`flex min-h-[6.5rem] w-full flex-col gap-1 p-1.5 text-left transition ${
+                        isSelected ? "ring-2 ring-inset ring-ink" : "hover:bg-accent/40"
                       }`}
                     >
-                      {date.getDate()}
-                    </span>
-
-                    {shown.map((project) => {
-                      const overdue = project.status !== "concluido" && project.day < todayKey;
-                      return (
-                        <span
-                          key={project.id}
-                          title={`${project.title} — ${project.editorName ?? "Sem editor atribuído"} (${STATUS_LABELS[statusOf(project.status)]})`}
-                          className={`flex items-center gap-1 truncate rounded-[6px] border px-1.5 py-0.5 text-[11px] leading-tight transition ${
-                            STATUS_CHIP[statusOf(project.status)]
-                          } ${overdue ? "border-red-500" : "border-ink"}`}
-                        >
-                          {overdue && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />}
-                          <span className="truncate">{project.title}</span>
-                        </span>
-                      );
-                    })}
-
-                    {dayProjects.length > shown.length && (
-                      <span className="px-1.5 text-[11px] font-medium text-ink/60">
-                        +{dayProjects.length - shown.length} mais
+                      <span
+                        className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
+                          isToday
+                            ? "bg-ink font-medium text-white"
+                            : inMonth
+                              ? "text-ink"
+                              : "text-ink/40"
+                        }`}
+                      >
+                        {date.getDate()}
                       </span>
+
+                      {shown.map((project) => {
+                        const overdue = project.status !== "concluido" && project.day < todayKey;
+                        return (
+                          <span
+                            key={project.id}
+                            title={`${project.title} — ${project.editorName ?? "Sem editor atribuído"} (${STATUS_LABELS[statusOf(project.status)]})`}
+                            className={`flex items-center gap-1 truncate rounded-[6px] border px-1.5 py-0.5 text-[11px] leading-tight transition ${
+                              STATUS_CHIP[statusOf(project.status)]
+                            } ${overdue ? "border-red-500" : "border-ink"}`}
+                          >
+                            {overdue && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />}
+                            <span className="truncate">{project.title}</span>
+                          </span>
+                        );
+                      })}
+
+                      {dayProjects.length > shown.length && (
+                        <span className="px-1.5 text-[11px] font-medium text-ink/60">
+                          +{dayProjects.length - shown.length} mais
+                        </span>
+                      )}
+                    </button>
+
+                    {canCreate && (
+                      <button
+                        type="button"
+                        onClick={() => setNewOnDay(key)}
+                        title="Novo projeto com entrega neste dia"
+                        aria-label={`Novo projeto com entrega em ${formatDate(`${key}T12:00:00`)}`}
+                        className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full border border-ink bg-white opacity-0 transition hover:bg-accent focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" aria-hidden>
+                          <path strokeLinecap="round" d="M12 5v14M5 12h14" />
+                        </svg>
+                      </button>
                     )}
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -303,6 +325,14 @@ export default function ProjectCalendar({
           </ul>
         )}
       </section>
+
+      {newOnDay && (
+        <NewProjectDialog
+          editors={editors}
+          day={newOnDay}
+          onClose={() => setNewOnDay(null)}
+        />
+      )}
     </div>
   );
 }

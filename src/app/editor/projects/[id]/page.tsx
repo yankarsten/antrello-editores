@@ -75,7 +75,7 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
               className="btn-accent !px-4 !py-2 text-sm"
               download
             >
-              Baixar todos (.zip)
+              Baixar tudo (.zip)
             </a>
           )}
         </div>

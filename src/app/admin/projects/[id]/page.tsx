@@ -73,8 +73,17 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
       </div>
 
       <section className="mt-10">
-        <div className="mb-4">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <SectionHeading count={sourceItems.length}>Vídeos brutos</SectionHeading>
+          {sourceItems.length > 0 && (
+            <a
+              href={`/api/projects/${project.id}/source-videos/zip`}
+              className="btn-accent !px-4 !py-2 text-sm"
+              download
+            >
+              Baixar tudo (.zip)
+            </a>
+          )}
         </div>
         <VideoList videos={sourceItems} emptyText="Nenhum vídeo bruto enviado ainda." />
         <div className="mt-4">

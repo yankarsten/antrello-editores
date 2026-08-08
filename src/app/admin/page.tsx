@@ -1,17 +1,26 @@
 import { db } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 import KanbanBoard, { type BoardProject } from "@/components/KanbanBoard";
 import PageHeader from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminBoardPage() {
-  const projects = await db.project.findMany({
-    include: {
-      assignedEditor: { select: { name: true } },
-      _count: { select: { deliveryVideos: true } },
-    },
-    orderBy: { deadline: "asc" },
-  });
+  const session = await getSession();
+  const [projects, editors] = await Promise.all([
+    db.project.findMany({
+      include: {
+        assignedEditor: { select: { name: true } },
+        _count: { select: { deliveryVideos: true } },
+      },
+      orderBy: { deadline: "asc" },
+    }),
+    db.user.findMany({
+      where: { role: "editor" },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
 
   const boardProjects: BoardProject[] = projects.map((p) => ({
     id: p.id,
@@ -26,9 +35,13 @@ export default async function AdminBoardPage() {
     <div>
       <PageHeader
         title="Quadro de projetos"
-        subtitle="Arraste os cartões para atualizar o status de cada projeto."
+        subtitle="Arraste os cartões para atualizar o status de cada projeto. Use o + de uma coluna para criar um projeto já nela."
       />
-      <KanbanBoard initialProjects={boardProjects} />
+      <KanbanBoard
+        initialProjects={boardProjects}
+        editors={editors}
+        canCreate={session?.role === "admin"}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   DragDropContext,
@@ -11,6 +11,8 @@ import {
 import { STATUSES, STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
 import { STATUS_FILL } from "@/lib/status-ui";
 import DeadlineBadge from "@/components/DeadlineBadge";
+import NewProjectDialog from "@/components/NewProjectDialog";
+import type { EditorOption } from "@/components/NewProjectForm";
 
 export interface BoardProject {
   id: string;
@@ -21,9 +23,23 @@ export interface BoardProject {
   deliveryCount: number;
 }
 
-export default function KanbanBoard({ initialProjects }: { initialProjects: BoardProject[] }) {
+export default function KanbanBoard({
+  initialProjects,
+  editors,
+  canCreate = false,
+}: {
+  initialProjects: BoardProject[];
+  editors: EditorOption[];
+  /** Admins only: shows the per-column "+" that creates a project. */
+  canCreate?: boolean;
+}) {
   const [projects, setProjects] = useState(initialProjects);
   const [error, setError] = useState<string | null>(null);
+  const [newIn, setNewIn] = useState<ProjectStatus | null>(null);
+
+  // A project created in the dialog arrives through a router.refresh(), which
+  // re-renders the server page and hands us a fresh list to adopt.
+  useEffect(() => setProjects(initialProjects), [initialProjects]);
 
   async function onDragEnd(result: DropResult) {
     const { draggableId, destination, source } = result;
@@ -70,7 +86,20 @@ export default function KanbanBoard({ initialProjects }: { initialProjects: Boar
               <div key={status} className="card-mist flex min-h-[300px] flex-col">
                 <div className="flex items-center justify-between gap-2 px-5 pb-3 pt-5">
                   <h2 className={`chip ${STATUS_FILL[status]}`}>{STATUS_LABELS[status]}</h2>
-                  <span className="text-sm font-medium text-ink/60">{cards.length}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-ink/60">{cards.length}</span>
+                    {canCreate && (
+                      <button
+                        type="button"
+                        onClick={() => setNewIn(status)}
+                        title={`Novo projeto em ${STATUS_LABELS[status]}`}
+                        aria-label={`Novo projeto em ${STATUS_LABELS[status]}`}
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-ink bg-white transition hover:bg-accent focus:outline-none focus:ring-4 focus:ring-accent/70"
+                      >
+                        <PlusIcon />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <Droppable droppableId={status}>
                   {(provided, snapshot) => (
@@ -127,6 +156,18 @@ export default function KanbanBoard({ initialProjects }: { initialProjects: Boar
           })}
         </div>
       </DragDropContext>
+
+      {newIn && (
+        <NewProjectDialog editors={editors} status={newIn} onClose={() => setNewIn(null)} />
+      )}
     </div>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden>
+      <path strokeLinecap="round" d="M12 5v14M5 12h14" />
+    </svg>
   );
 }
