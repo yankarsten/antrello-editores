@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { isDoneStatus } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { isInviteUsable } from "@/lib/invites";
 import PageHeader from "@/components/PageHeader";
@@ -82,7 +83,7 @@ export default async function EditorsPage() {
                   <tr className="border-b border-ink bg-mist text-xs uppercase tracking-wide text-ink">
                     <th className="px-4 py-3 font-medium">Nome</th>
                     <th className="px-4 py-3 font-medium">Vídeos ativos</th>
-                    <th className="px-4 py-3 font-medium">Concluídos</th>
+                    <th className="px-4 py-3 font-medium">Finalizados</th>
                     <th className="px-4 py-3 font-medium">Entregas</th>
                     <th className="px-4 py-3 font-medium">Cadastro</th>
                     <th className="px-4 py-3 text-right font-medium">Ações</th>
@@ -90,7 +91,7 @@ export default async function EditorsPage() {
                 </thead>
                 <tbody>
                   {editors.map((editor) => {
-                    const active = editor.projectsAssigned.filter((p) => p.status !== "concluido").length;
+                    const active = editor.projectsAssigned.filter((p) => !isDoneStatus(p.status)).length;
                     const done = editor.projectsAssigned.length - active;
                     return (
                       <tr key={editor.id} className="border-b border-ink/15 last:border-0">

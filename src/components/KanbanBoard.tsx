@@ -79,7 +79,9 @@ export default function KanbanBoard({
     <div>
       {error && <p className="alert-error mb-4">{error}</p>}
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        {/* Four columns only fit side by side on a wide screen; below that they
+            pair up rather than shrinking into unreadable strips. */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {STATUSES.map((status) => {
             const cards = projects.filter((p) => p.status === status);
             return (

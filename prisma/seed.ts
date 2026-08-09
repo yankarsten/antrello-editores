@@ -47,7 +47,7 @@ async function main() {
           title: "Institucional Café Bravo",
           description: "Vídeo institucional de 2 minutos para o site da marca. Cortes dinâmicos, trilha animada.",
           deadline: daysFromNow(12),
-          status: "em_edicao",
+          status: "a_gravar",
           createdById: admin.id,
         },
         {
@@ -79,6 +79,14 @@ async function main() {
           deadline: daysFromNow(-10),
           status: "concluido",
           assignedEditorId: editors[0].id,
+          createdById: admin.id,
+        },
+        {
+          title: "Campanha Dia dos Pais",
+          description: "Filme de 30 segundos veiculado nas redes da marca.",
+          deadline: daysFromNow(-20),
+          status: "publicado",
+          assignedEditorId: editors[1].id,
           createdById: admin.id,
         },
       ],

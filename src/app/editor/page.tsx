@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { isDoneStatus } from "@/lib/constants";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import StatusBadge from "@/components/StatusBadge";
 import PageHeader from "@/components/PageHeader";
@@ -31,8 +32,8 @@ export default async function EditorDashboardPage() {
 
   // Finished work never competes for attention with the deadline-sorted
   // active list: it always sits below the divider, newest deadline last.
-  const active = projects.filter((p) => p.status !== "concluido");
-  const done = projects.filter((p) => p.status === "concluido");
+  const active = projects.filter((p) => !isDoneStatus(p.status));
+  const done = projects.filter((p) => isDoneStatus(p.status));
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -66,7 +67,7 @@ export default async function EditorDashboardPage() {
             <>
               <div className="my-8 flex items-center gap-3">
                 <span className="h-px flex-1 bg-ink" />
-                <span className="chip bg-ink text-white">Concluídos</span>
+                <span className="chip bg-ink text-white">Finalizados</span>
                 <span className="h-px flex-1 bg-ink" />
               </div>
               <ul className="space-y-4">

@@ -1,3 +1,5 @@
+import { isDoneStatus } from "@/lib/constants";
+
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "short",
@@ -56,7 +58,7 @@ export function daysUntil(deadline: Date | string): number {
 export type DeadlineTone = "overdue" | "soon" | "ok";
 
 export function deadlineTone(deadline: Date | string, status?: string): DeadlineTone {
-  if (status === "concluido") return "ok";
+  if (isDoneStatus(status)) return "ok";
   const days = daysUntil(deadline);
   if (days < 0) return "overdue";
   if (days <= 3) return "soon";

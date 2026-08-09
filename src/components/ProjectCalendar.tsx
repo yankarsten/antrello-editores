@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { DEFAULT_STATUS, STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
+import { DEFAULT_STATUS, STATUS_LABELS, isDoneStatus, type ProjectStatus } from "@/lib/constants";
 import { STATUS_CHIP, STATUS_DOT } from "@/lib/status-ui";
 import { formatDate } from "@/lib/format";
 import NewProjectDialog from "@/components/NewProjectDialog";
@@ -76,7 +76,7 @@ export default function ProjectCalendar({
   const visible = useMemo(
     () =>
       projects.filter((p) => {
-        if (hideDone && p.status === "concluido") return false;
+        if (hideDone && isDoneStatus(p.status)) return false;
         if (editorFilter === "all") return true;
         if (editorFilter === "none") return p.editorId === null;
         return p.editorId === editorFilter;
@@ -148,7 +148,7 @@ export default function ProjectCalendar({
                 checked={hideDone}
                 onChange={(e) => setHideDone(e.target.checked)}
               />
-              Ocultar concluídos
+              Ocultar finalizados
             </label>
             <select
               className="input !w-auto !py-1.5 text-xs"
@@ -212,7 +212,7 @@ export default function ProjectCalendar({
                       </span>
 
                       {shown.map((project) => {
-                        const overdue = project.status !== "concluido" && project.day < todayKey;
+                        const overdue = !isDoneStatus(project.status) && project.day < todayKey;
                         return (
                           <span
                             key={project.id}
@@ -290,7 +290,7 @@ export default function ProjectCalendar({
         ) : (
           <ul className="space-y-2">
             {listed.map((project) => {
-              const overdue = project.status !== "concluido" && project.day < todayKey;
+              const overdue = !isDoneStatus(project.status) && project.day < todayKey;
               return (
                 <li className="flex flex-wrap items-center gap-3 rounded-control border border-ink bg-white px-4 py-3" key={project.id}>
                   <span

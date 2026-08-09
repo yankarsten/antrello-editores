@@ -1,3 +1,4 @@
+import { isDoneStatus } from "@/lib/constants";
 import { deadlineText, deadlineTone, formatDate } from "@/lib/format";
 
 // Overdue keeps a red fill — it is the one signal that has to break out of the
@@ -18,7 +19,7 @@ export default function DeadlineBadge({
   showRelative?: boolean;
 }) {
   const tone = deadlineTone(deadline, status);
-  const done = status === "concluido";
+  const done = isDoneStatus(status);
   return (
     <span className={`chip ${TONE_CLASSES[tone]}`} title={`Prazo: ${formatDate(deadline)}`}>
       <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3" aria-hidden>

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { DEFAULT_STATUS, STATUS_LABELS } from "@/lib/constants";
 import KanbanBoard, { type BoardProject } from "@/components/KanbanBoard";
 import PageHeader from "@/components/PageHeader";
 
@@ -35,7 +36,7 @@ export default async function AdminBoardPage() {
     <div>
       <PageHeader
         title="Quadro de vídeos"
-        subtitle="Clique em um cartão para abrir o vídeo ou use a alça à direita dele para arrastá-lo entre as colunas. Use o + em Em edição para criar um vídeo."
+        subtitle={`Clique em um cartão para abrir o vídeo ou use a alça à direita dele para arrastá-lo entre as colunas. Use o + em ${STATUS_LABELS[DEFAULT_STATUS]} para criar um vídeo.`}
       />
       <KanbanBoard
         initialProjects={boardProjects}

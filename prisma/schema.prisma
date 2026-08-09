@@ -52,14 +52,15 @@ model Invite {
   acceptedBy User? @relation("InviteAcceptedBy", fields: [acceptedById], references: [id], onDelete: Cascade)
 }
 
-// status: "em_edicao" | "concluido"
+// status: "a_gravar" | "em_edicao" | "concluido" | "publicado"
+// (see lib/constants.ts — the board's columns follow that order)
 model Project {
   id               String   @id @default(cuid())
   title            String
   description      String?
   notes            String?
   deadline         DateTime
-  status           String   @default("em_edicao")
+  status           String   @default("a_gravar")
   assignedEditorId String?
   createdById      String
   createdAt        DateTime @default(now())
