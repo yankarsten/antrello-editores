@@ -1,15 +1,21 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { dayKey } from "@/lib/format";
+import type { MediaKind } from "@/lib/media";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import StatusBadge from "@/components/StatusBadge";
-import VideoList, { type VideoItem } from "@/components/VideoList";
+import FileList, { type FileItem } from "@/components/FileList";
+import SectionNav from "@/components/SectionNav";
 import { SectionHeading } from "@/components/PageHeader";
 import ProjectControls from "./ProjectControls";
 import ProjectNotes from "./ProjectNotes";
 import AddSourceVideos from "./AddSourceVideos";
+import AddAttachments from "./AddAttachments";
 
 export const dynamic = "force-dynamic";
+
+/** Rows shown before a long list collapses behind "Mostrar todos". */
+const PREVIEW_ROWS = 4;
 
 export default async function AdminProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -18,6 +24,7 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
     include: {
       assignedEditor: { select: { id: true, name: true } },
       sourceVideos: { orderBy: { uploadedAt: "asc" } },
+      attachments: { orderBy: { uploadedAt: "asc" } },
       deliveryVideos: { orderBy: { uploadedAt: "desc" }, include: { uploadedBy: { select: { name: true } } } },
     },
   });
@@ -29,7 +36,7 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
     orderBy: { name: "asc" },
   });
 
-  const sourceItems: VideoItem[] = project.sourceVideos.map((v) => ({
+  const sourceItems: FileItem[] = project.sourceVideos.map((v) => ({
     id: v.id,
     type: "source",
     fileName: v.fileName,
@@ -37,7 +44,16 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
     uploadedAt: v.uploadedAt.toISOString(),
   }));
 
-  const deliveryItems: VideoItem[] = project.deliveryVideos.map((v) => ({
+  const attachmentItems: FileItem[] = project.attachments.map((a) => ({
+    id: a.id,
+    type: "attachment",
+    kind: a.kind as MediaKind,
+    fileName: a.fileName,
+    size: a.size,
+    uploadedAt: a.uploadedAt.toISOString(),
+  }));
+
+  const deliveryItems: FileItem[] = project.deliveryVideos.map((v) => ({
     id: v.id,
     type: "delivery",
     fileName: v.fileName,
@@ -57,6 +73,14 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
         <DeadlineBadge deadline={project.deadline} status={project.status} />
       </div>
 
+      <SectionNav
+        sections={[
+          { id: "brutos", label: "Vídeos brutos", count: sourceItems.length },
+          { id: "anexos", label: "Anexos", count: attachmentItems.length },
+          { id: "entregas", label: "Entregas do editor", count: deliveryItems.length },
+        ]}
+      />
+
       {project.description && (
         <p className="mt-5 whitespace-pre-wrap text-sm leading-relaxed text-ink/70">{project.description}</p>
       )}
@@ -74,7 +98,7 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
         />
       </div>
 
-      <section className="mt-10">
+      <section id="brutos" className="mt-10 scroll-mt-32">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <SectionHeading count={sourceItems.length}>Vídeos brutos</SectionHeading>
           {sourceItems.length > 0 && (
@@ -87,18 +111,39 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
             </a>
           )}
         </div>
-        <VideoList videos={sourceItems} emptyText="Nenhum vídeo bruto enviado ainda." />
+        <FileList
+          files={sourceItems}
+          maxVisible={PREVIEW_ROWS}
+          emptyText="Nenhum vídeo bruto enviado ainda."
+        />
         <div className="mt-4">
           <AddSourceVideos projectId={project.id} />
         </div>
       </section>
 
-      <section className="mt-10">
+      <section id="anexos" className="mt-10 scroll-mt-32">
+        <div className="mb-4">
+          <SectionHeading count={attachmentItems.length}>Anexos</SectionHeading>
+          <p className="mt-1 text-sm text-ink/60">
+            Material de apoio para o editor — vídeos de referência, thumbnails, logos, prints.
+          </p>
+        </div>
+        <FileList
+          files={attachmentItems}
+          maxVisible={PREVIEW_ROWS}
+          emptyText="Nenhum anexo enviado ainda."
+        />
+        <div className="mt-4">
+          <AddAttachments projectId={project.id} />
+        </div>
+      </section>
+
+      <section id="entregas" className="mt-10 scroll-mt-32">
         <div className="mb-4">
           <SectionHeading count={deliveryItems.length}>Entregas do editor</SectionHeading>
         </div>
-        <VideoList
-          videos={deliveryItems}
+        <FileList
+          files={deliveryItems}
           emptyText="Nenhuma entrega ainda. Assim que o editor enviar um vídeo final, ele aparece aqui."
         />
       </section>

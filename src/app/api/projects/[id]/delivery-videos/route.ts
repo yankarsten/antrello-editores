@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { isAllowedVideo, saveChunk } from "@/lib/storage";
+import { isAllowedVideo } from "@/lib/media";
+import { saveChunk } from "@/lib/storage";
 import { readChunkMeta } from "@/lib/upload";
 
 // Chunked upload of an editor's delivery video (see source-videos route for the

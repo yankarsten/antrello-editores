@@ -70,6 +70,7 @@ model Project {
 
   sourceVideos   SourceVideo[]
   deliveryVideos DeliveryVideo[]
+  attachments    Attachment[]
 }
 
 model SourceVideo {
@@ -77,6 +78,21 @@ model SourceVideo {
   projectId  String
   fileName   String
   storedName String
+  size       Int      @default(0)
+  uploadedAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// Reference material the admin attaches to a video besides the raw footage:
+// briefings, thumbnails, logos, example clips. Unlike SourceVideo it also takes
+// images, so `kind` ("video" | "image") tells the UI how to preview the file.
+model Attachment {
+  id         String   @id @default(cuid())
+  projectId  String
+  fileName   String
+  storedName String
+  kind       String   @default("video")
   size       Int      @default(0)
   uploadedAt DateTime @default(now())
 

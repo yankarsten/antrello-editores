@@ -8,9 +8,7 @@ import {
   useState,
 } from "react";
 import { formatFileSize } from "@/lib/format";
-
-const ALLOWED = ["mp4", "mov", "mkv", "webm", "avi"];
-const ACCEPT = ALLOWED.map((e) => `.${e}`).join(",");
+import { VIDEO_EXTENSIONS, extensionOf, formatExtensions } from "@/lib/media";
 
 type FileStatus = "pending" | "uploading" | "done" | "error";
 
@@ -29,6 +27,10 @@ export interface UploadDropzoneHandle {
 
 interface Props {
   multiple?: boolean;
+  /** Extensions the picker accepts. Must match what the endpoint enforces. */
+  allowedExtensions?: string[];
+  /** Call to action inside the drop area. */
+  prompt?: string;
   /** When set, files start uploading as soon as they are selected. */
   endpoint?: string;
   extraHeaders?: Record<string, string>;
@@ -109,7 +111,14 @@ async function uploadFile(
 }
 
 const UploadDropzone = forwardRef<UploadDropzoneHandle, Props>(function UploadDropzone(
-  { multiple = true, endpoint, extraHeaders, onAllDone },
+  {
+    multiple = true,
+    allowedExtensions = VIDEO_EXTENSIONS,
+    prompt,
+    endpoint,
+    extraHeaders,
+    onAllDone,
+  },
   ref
 ) {
   const [entries, setEntries] = useState<FileEntry[]>([]);
@@ -155,9 +164,7 @@ const UploadDropzone = forwardRef<UploadDropzoneHandle, Props>(function UploadDr
   const addFiles = useCallback(
     (files: FileList | File[]) => {
       const incoming = Array.from(files);
-      const bad = incoming.filter(
-        (f) => !ALLOWED.includes(f.name.split(".").pop()?.toLowerCase() ?? "")
-      );
+      const bad = incoming.filter((f) => !allowedExtensions.includes(extensionOf(f.name)));
       const good = incoming.filter((f) => !bad.includes(f));
       setRejected(bad.map((f) => f.name));
       if (good.length === 0) return;
@@ -173,7 +180,7 @@ const UploadDropzone = forwardRef<UploadDropzoneHandle, Props>(function UploadDr
         setTimeout(() => runUpload(endpoint, extraHeaders, newEntries), 0);
       }
     },
-    [endpoint, extraHeaders, multiple, runUpload]
+    [allowedExtensions, endpoint, extraHeaders, multiple, runUpload]
   );
 
   function removeEntry(file: File) {
@@ -208,13 +215,16 @@ const UploadDropzone = forwardRef<UploadDropzoneHandle, Props>(function UploadDr
           </svg>
         </span>
         <p className="text-sm font-medium text-ink">
-          {multiple ? "Arraste os vídeos aqui ou clique para selecionar" : "Arraste o vídeo aqui ou clique para selecionar"}
+          {prompt ??
+            (multiple
+              ? "Arraste os vídeos aqui ou clique para selecionar"
+              : "Arraste o vídeo aqui ou clique para selecionar")}
         </p>
-        <p className="text-xs text-ink/60">Formatos aceitos: MP4, MOV, MKV, WEBM, AVI</p>
+        <p className="text-xs text-ink/60">Formatos aceitos: {formatExtensions(allowedExtensions)}</p>
         <input
           ref={inputRef}
           type="file"
-          accept={ACCEPT}
+          accept={allowedExtensions.map((e) => `.${e}`).join(",")}
           multiple={multiple}
           className="hidden"
           onChange={(e) => {

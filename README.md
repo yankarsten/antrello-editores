@@ -41,4 +41,16 @@ A conta de admin é criada apenas pelo seed (`ADMIN_NAME`/`ADMIN_PASSWORD` no `.
 
 ## Uploads
 
-Os vídeos são gravados em `storage/` (ignorado pelo git) via streaming — um request por arquivo, sem carregar o arquivo na memória — e servidos por rota autenticada com suporte a HTTP Range (seek no player). A troca por object storage (S3/R2/GCS) fica concentrada em `src/lib/storage.ts` e na rota `src/app/api/videos/[type]/[id]/route.ts`.
+Os arquivos são gravados em `storage/` (ignorado pelo git) via streaming — um request por arquivo, sem carregar o arquivo na memória — e servidos por rota autenticada com suporte a HTTP Range (seek no player). A troca por object storage (S3/R2/GCS) fica concentrada em `src/lib/storage.ts` e na rota `src/app/api/files/[type]/[id]/route.ts`; o que pode ser enviado e como cada formato é servido fica em `src/lib/media.ts` (compartilhado com o cliente).
+
+Cada vídeo tem três listas de arquivos:
+
+| Seção                | Quem envia | Aceita                     |
+| -------------------- | ---------- | -------------------------- |
+| Vídeos brutos        | admin      | vídeos                     |
+| Anexos               | admin      | vídeos **e** imagens       |
+| Entregas do editor   | editor     | vídeos                     |
+
+**Anexos** são o material de apoio (referências, thumbnails, logos, prints) que não é bruto a ser editado; imagens aparecem com miniatura e abrem inline na própria lista.
+
+Listas longas mostram as primeiras 4 linhas com um botão "Mostrar todos", e a barra fixa no topo da página do vídeo pula direto para cada seção — assim dezenas de brutos não empurram as entregas para fora da tela.

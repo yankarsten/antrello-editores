@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { isAllowedVideo } from "@/lib/media";
+import { ATTACHMENT_EXTENSIONS, formatExtensions, isAllowedAttachment, mediaKind } from "@/lib/media";
 import { saveChunk } from "@/lib/storage";
 import { readChunkMeta } from "@/lib/upload";
 
-// Chunked raw-body upload: the client sends the file as a sequence of <100 MB
-// parts (so each request fits under Cloudflare's proxy body limit), keyed by
-// the x-upload-id header. The DB row is created only on the final chunk.
+// Chunked upload of an "anexo" — reference material for a video (see the
+// source-videos route for the chunking approach). Admin only, and unlike the
+// raw footage it also accepts images.
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (session?.role !== "admin") {
@@ -19,9 +19,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!project) return NextResponse.json({ error: "Vídeo não encontrado." }, { status: 404 });
 
   const fileName = decodeURIComponent(request.headers.get("x-file-name") ?? "").trim();
-  if (!fileName || !isAllowedVideo(fileName)) {
+  if (!fileName || !isAllowedAttachment(fileName)) {
     return NextResponse.json(
-      { error: "Formato não suportado. Envie arquivos mp4, mov, mkv, webm ou avi." },
+      { error: `Formato não suportado. Envie arquivos ${formatExtensions(ATTACHMENT_EXTENSIONS)}.` },
       { status: 400 }
     );
   }
@@ -40,9 +40,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ received: chunkIndex }, { status: 200 });
   }
 
-  const video = await db.sourceVideo.create({
-    data: { projectId: id, fileName, storedName: result.storedName!, size: result.size! },
+  const attachment = await db.attachment.create({
+    data: {
+      projectId: id,
+      fileName,
+      kind: mediaKind(fileName),
+      storedName: result.storedName!,
+      size: result.size!,
+    },
   });
 
-  return NextResponse.json({ id: video.id }, { status: 201 });
+  return NextResponse.json({ id: attachment.id }, { status: 201 });
 }

@@ -75,13 +75,13 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
   const { id } = await params;
   const project = await db.project.findUnique({
     where: { id },
-    include: { sourceVideos: true, deliveryVideos: true },
+    include: { sourceVideos: true, deliveryVideos: true, attachments: true },
   });
   if (!project) return NextResponse.json({ error: "Vídeo não encontrado." }, { status: 404 });
 
   await db.project.delete({ where: { id } });
-  for (const video of [...project.sourceVideos, ...project.deliveryVideos]) {
-    deleteStoredFile(video.storedName);
+  for (const file of [...project.sourceVideos, ...project.deliveryVideos, ...project.attachments]) {
+    deleteStoredFile(file.storedName);
   }
 
   return NextResponse.json({ ok: true });
