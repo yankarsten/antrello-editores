@@ -100,6 +100,10 @@ model Attachment {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
+// A final video of the project. Uploaded by the assigned editor or by an admin
+// — either way `label` and `fileName` are assigned by the server from the
+// project's title and the delivery's position in the sequence (see
+// lib/delivery.ts), never taken from the uploaded file.
 model DeliveryVideo {
   id           String   @id @default(cuid())
   projectId    String

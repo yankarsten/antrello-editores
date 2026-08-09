@@ -1,6 +1,6 @@
 # Antrello Editores
 
-Ferramenta interna para gestão de edição de vídeos: a administração cria vídeos, envia os brutos e acompanha tudo em um quadro kanban; editores recebem vídeos, baixam o material e enviam suas entregas ("Vídeo Final", "Vídeo Final R2"…).
+Ferramenta interna para gestão de edição de vídeos: a administração cria vídeos, envia os brutos e acompanha tudo em um quadro kanban; editores recebem vídeos, baixam o material e enviam suas entregas ("Vídeo Final R1", "Vídeo Final R2"…).
 
 Na interface a unidade de trabalho se chama **vídeo**; no código e no banco ela continua sendo `Project` (`/admin/projects`, `db.project`).
 
@@ -45,12 +45,14 @@ Os arquivos são gravados em `storage/` (ignorado pelo git) via streaming — um
 
 Cada vídeo tem três listas de arquivos:
 
-| Seção                | Quem envia | Aceita                     |
-| -------------------- | ---------- | -------------------------- |
-| Vídeos brutos        | admin      | vídeos                     |
-| Anexos               | admin      | vídeos **e** imagens       |
-| Entregas do editor   | editor     | vídeos                     |
+| Seção          | Quem envia               | Aceita               |
+| -------------- | ------------------------ | -------------------- |
+| Vídeos brutos  | admin                    | vídeos               |
+| Anexos         | admin                    | vídeos **e** imagens |
+| Vídeos finais  | editor responsável e admin | vídeos             |
 
 **Anexos** são o material de apoio (referências, thumbnails, logos, prints) que não é bruto a ser editado; imagens aparecem com miniatura e abrem inline na própria lista.
+
+**Vídeos finais** são numerados pelo servidor, não pelo nome do export: cada envio vira `<título-do-vídeo>-r<N>.<formato>` — "Pobre Quente" gera `pobre_quente-r1.mp4`, `pobre_quente-r2.mp4`, e assim por diante. O admin pode enviar um vídeo final em qualquer vídeo (inclusive sem editor atribuído), e esses envios entram na mesma numeração. A regra de nome fica em `src/lib/delivery.ts`, compartilhada entre o servidor e a prévia mostrada nos formulários de envio.
 
 Listas longas mostram as primeiras 4 linhas com um botão "Mostrar todos", e a barra fixa no topo da página do vídeo pula direto para cada seção — assim dezenas de brutos não empurram as entregas para fora da tela.

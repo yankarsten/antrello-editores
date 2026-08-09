@@ -6,6 +6,7 @@ import { DEFAULT_STATUS, STATUS_LABELS, isDoneStatus, type ProjectStatus } from 
 import { STATUS_CHIP, STATUS_DOT } from "@/lib/status-ui";
 import { formatDate } from "@/lib/format";
 import NewProjectDialog from "@/components/NewProjectDialog";
+import type { EditorOption } from "@/lib/editors";
 
 export interface CalendarProject {
   id: string;
@@ -16,11 +17,6 @@ export interface CalendarProject {
   editorId: string | null;
   editorName: string | null;
   deliveryCount: number;
-}
-
-export interface CalendarEditor {
-  id: string;
-  name: string;
 }
 
 const WEEKDAYS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
@@ -61,7 +57,7 @@ export default function ProjectCalendar({
   canCreate = false,
 }: {
   projects: CalendarProject[];
-  editors: CalendarEditor[];
+  editors: EditorOption[];
   todayKey: string;
   /** Admins only: shows the per-day "+" that creates a project. */
   canCreate?: boolean;

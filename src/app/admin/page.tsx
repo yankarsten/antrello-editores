@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { DEFAULT_STATUS, STATUS_LABELS } from "@/lib/constants";
+import { listEditorOptions } from "@/lib/editors";
 import KanbanBoard, { type BoardProject } from "@/components/KanbanBoard";
 import PageHeader from "@/components/PageHeader";
 
@@ -16,11 +17,7 @@ export default async function AdminBoardPage() {
       },
       orderBy: { deadline: "asc" },
     }),
-    db.user.findMany({
-      where: { role: "editor" },
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
-    }),
+    listEditorOptions(),
   ]);
 
   const boardProjects: BoardProject[] = projects.map((p) => ({

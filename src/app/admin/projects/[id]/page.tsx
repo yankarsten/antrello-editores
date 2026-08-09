@@ -6,11 +6,13 @@ import DeadlineBadge from "@/components/DeadlineBadge";
 import StatusBadge from "@/components/StatusBadge";
 import FileList, { type FileItem } from "@/components/FileList";
 import SectionNav from "@/components/SectionNav";
+import { listEditorOptions } from "@/lib/editors";
 import { SectionHeading } from "@/components/PageHeader";
 import ProjectControls from "./ProjectControls";
 import ProjectNotes from "./ProjectNotes";
 import AddSourceVideos from "./AddSourceVideos";
 import AddAttachments from "./AddAttachments";
+import AddDeliveryVideos from "./AddDeliveryVideos";
 
 export const dynamic = "force-dynamic";
 
@@ -30,11 +32,7 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
   });
   if (!project) notFound();
 
-  const editors = await db.user.findMany({
-    where: { role: "editor" },
-    select: { id: true, name: true },
-    orderBy: { name: "asc" },
-  });
+  const editors = await listEditorOptions();
 
   const sourceItems: FileItem[] = project.sourceVideos.map((v) => ({
     id: v.id,
@@ -77,7 +75,7 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
         sections={[
           { id: "brutos", label: "Vídeos brutos", count: sourceItems.length },
           { id: "anexos", label: "Anexos", count: attachmentItems.length },
-          { id: "entregas", label: "Entregas do editor", count: deliveryItems.length },
+          { id: "entregas", label: "Vídeos finais", count: deliveryItems.length },
         ]}
       />
 
@@ -140,12 +138,23 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
 
       <section id="entregas" className="mt-10 scroll-mt-32">
         <div className="mb-4">
-          <SectionHeading count={deliveryItems.length}>Entregas do editor</SectionHeading>
+          <SectionHeading count={deliveryItems.length}>Vídeos finais</SectionHeading>
+          <p className="mt-1 text-sm text-ink/60">
+            Entregas do editor e vídeos finais enviados pela administração, na ordem em que chegaram.
+          </p>
         </div>
         <FileList
           files={deliveryItems}
-          emptyText="Nenhuma entrega ainda. Assim que o editor enviar um vídeo final, ele aparece aqui."
+          maxVisible={PREVIEW_ROWS}
+          emptyText="Nenhum vídeo final ainda. Assim que o editor enviar uma entrega, ela aparece aqui."
         />
+        <div className="mt-4">
+          <AddDeliveryVideos
+            projectId={project.id}
+            projectTitle={project.title}
+            nextRevision={deliveryItems.length + 1}
+          />
+        </div>
       </section>
     </div>
   );

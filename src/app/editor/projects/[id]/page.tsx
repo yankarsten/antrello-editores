@@ -57,9 +57,6 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
     uploaderName: v.uploadedBy?.name ?? "Editor removido",
   }));
 
-  const suggestedLabel =
-    deliveryItems.length === 0 ? "Vídeo Final" : `Vídeo Final R${deliveryItems.length + 1}`;
-
   return (
     <div className="mx-auto max-w-4xl">
       <h1 className="text-3xl font-medium leading-tight">
@@ -129,7 +126,11 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
           <SectionHeading>Enviar entrega</SectionHeading>
         </div>
         <div className="rounded-card border border-ink bg-white p-8 shadow-hard">
-          <DeliveryUpload projectId={project.id} suggestedLabel={suggestedLabel} />
+          <DeliveryUpload
+            projectId={project.id}
+            projectTitle={project.title}
+            nextRevision={deliveryItems.length + 1}
+          />
         </div>
       </section>
 

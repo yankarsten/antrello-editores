@@ -2,12 +2,9 @@
 
 import { useRef, useState } from "react";
 import UploadDropzone, { type UploadDropzoneHandle } from "@/components/UploadDropzone";
+import EditorSelect from "@/components/EditorSelect";
 import type { ProjectStatus } from "@/lib/constants";
-
-export interface EditorOption {
-  id: string;
-  name: string;
-}
+import type { EditorOption } from "@/lib/editors";
 
 export default function NewProjectForm({
   editors,
@@ -136,23 +133,14 @@ export default function NewProjectForm({
             disabled={busy}
           />
         </div>
-        <div>
-          <label htmlFor="editor" className="label">Editor responsável</label>
-          <select
-            id="editor"
-            className="input"
-            value={assignedEditorId}
-            onChange={(e) => setAssignedEditorId(e.target.value)}
-            disabled={busy}
-          >
-            <option value="">Atribuir depois</option>
-            {editors.map((editor) => (
-              <option key={editor.id} value={editor.id}>
-                {editor.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <EditorSelect
+          id="editor"
+          value={assignedEditorId}
+          editors={editors}
+          disabled={busy}
+          unassignedLabel="Atribuir depois"
+          onChange={setAssignedEditorId}
+        />
       </div>
 
       <div>

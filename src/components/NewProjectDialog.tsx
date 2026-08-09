@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import NewProjectForm, { type EditorOption } from "@/components/NewProjectForm";
+import NewProjectForm from "@/components/NewProjectForm";
 import { STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
+import type { EditorOption } from "@/lib/editors";
 import { formatDate } from "@/lib/format";
 
 /**

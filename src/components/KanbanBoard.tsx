@@ -12,7 +12,7 @@ import { DEFAULT_STATUS, STATUSES, STATUS_LABELS, type ProjectStatus } from "@/l
 import { STATUS_FILL } from "@/lib/status-ui";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import NewProjectDialog from "@/components/NewProjectDialog";
-import type { EditorOption } from "@/components/NewProjectForm";
+import type { EditorOption } from "@/lib/editors";
 
 export interface BoardProject {
   id: string;

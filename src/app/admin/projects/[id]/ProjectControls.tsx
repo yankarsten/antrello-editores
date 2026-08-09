@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { STATUSES, STATUS_LABELS } from "@/lib/constants";
-
-interface EditorOption {
-  id: string;
-  name: string;
-}
+import EditorSelect from "@/components/EditorSelect";
+import type { EditorOption } from "@/lib/editors";
 
 export default function ProjectControls({
   projectId,
@@ -26,6 +23,7 @@ export default function ProjectControls({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [editorId, setEditorId] = useState(currentEditorId);
 
   async function patch(body: Record<string, unknown>) {
     setBusy(true);
@@ -60,23 +58,17 @@ export default function ProjectControls({
   return (
     <div className="mt-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div>
-          <label htmlFor="assigned-editor" className="label">Editor responsável</label>
-          <select
-            id="assigned-editor"
-            className="input"
-            defaultValue={currentEditorId}
-            disabled={busy}
-            onChange={(e) => patch({ assignedEditorId: e.target.value || null })}
-          >
-            <option value="">Sem editor atribuído</option>
-            {editors.map((editor) => (
-              <option key={editor.id} value={editor.id}>
-                {editor.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <EditorSelect
+          id="assigned-editor"
+          value={editorId}
+          editors={editors}
+          disabled={busy}
+          unassignedLabel="Sem editor atribuído"
+          onChange={(value) => {
+            setEditorId(value);
+            patch({ assignedEditorId: value || null });
+          }}
+        />
         <div>
           <label htmlFor="status" className="label">Status</label>
           <select

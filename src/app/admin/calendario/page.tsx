@@ -1,10 +1,8 @@
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { dayKey } from "@/lib/format";
-import ProjectCalendar, {
-  type CalendarEditor,
-  type CalendarProject,
-} from "@/components/ProjectCalendar";
+import { listEditorOptions } from "@/lib/editors";
+import ProjectCalendar, { type CalendarProject } from "@/components/ProjectCalendar";
 import PageHeader from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
@@ -19,11 +17,7 @@ export default async function CalendarPage() {
       },
       orderBy: { deadline: "asc" },
     }),
-    db.user.findMany({
-      where: { role: "editor" },
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
-    }),
+    listEditorOptions(),
   ]);
 
   const calendarProjects: CalendarProject[] = projects.map((p) => ({
@@ -36,8 +30,6 @@ export default async function CalendarPage() {
     deliveryCount: p._count.deliveryVideos,
   }));
 
-  const calendarEditors: CalendarEditor[] = editors;
-
   return (
     <div>
       <PageHeader
@@ -48,7 +40,7 @@ export default async function CalendarPage() {
           between server and client render. */}
       <ProjectCalendar
         projects={calendarProjects}
-        editors={calendarEditors}
+        editors={editors}
         todayKey={dayKey(new Date())}
         canCreate={session?.role === "admin"}
       />
