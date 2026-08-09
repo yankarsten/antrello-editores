@@ -37,21 +37,21 @@ export default async function EditorDashboardPage() {
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
-        title="Meus projetos"
-        subtitle="Projetos atribuídos a você, ordenados pelo prazo mais próximo."
+        title="Meus vídeos"
+        subtitle="Vídeos atribuídos a você, ordenados pelo prazo mais próximo."
       />
 
       {projects.length === 0 ? (
         <div className="card-empty !py-12">
-          <p className="text-base font-medium text-ink">Nenhum projeto atribuído a você ainda.</p>
+          <p className="text-base font-medium text-ink">Nenhum vídeo atribuído a você ainda.</p>
           <p className="mt-2 text-sm text-ink/70">
-            Assim que a administração atribuir um projeto, ele aparece aqui.
+            Assim que a administração atribuir um vídeo, ele aparece aqui.
           </p>
         </div>
       ) : (
         <>
           {active.length === 0 ? (
-            <p className="card-empty">Nenhum projeto em edição no momento.</p>
+            <p className="card-empty">Nenhum vídeo em edição no momento.</p>
           ) : (
             <ul className="space-y-4">
               {active.map((project) => (

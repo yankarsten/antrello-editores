@@ -81,7 +81,7 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
         </div>
         <VideoList
           videos={sourceItems}
-          emptyText="A administração ainda não enviou os vídeos brutos deste projeto."
+          emptyText="A administração ainda não enviou nenhum vídeo bruto aqui."
         />
       </section>
 
@@ -100,7 +100,7 @@ export default async function EditorProjectPage({ params }: { params: Promise<{ 
         </div>
         <VideoList
           videos={deliveryItems}
-          emptyText="Você ainda não enviou nenhuma entrega para este projeto."
+          emptyText="Você ainda não enviou nenhuma entrega para este vídeo."
         />
       </section>
     </div>

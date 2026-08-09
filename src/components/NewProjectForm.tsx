@@ -57,7 +57,7 @@ export default function NewProjectForm({
       }).catch(() => null);
       const data = await res?.json().catch(() => ({}));
       if (!res || !res.ok) {
-        setError(data?.error ?? "Não foi possível criar o projeto.");
+        setError(data?.error ?? "Não foi possível criar o vídeo.");
         setPhase("idle");
         return;
       }
@@ -69,7 +69,7 @@ export default function NewProjectForm({
       setPhase("uploading");
       const ok = await dropzoneRef.current.upload(`/api/projects/${projectId}/source-videos`);
       if (!ok) {
-        setError("O projeto foi criado, mas alguns vídeos falharam. Clique novamente para reenviar os pendentes.");
+        setError("O vídeo foi criado, mas o envio de alguns arquivos falhou. Clique novamente para reenviar os pendentes.");
         setPhase("idle");
         return;
       }
@@ -159,7 +159,7 @@ export default function NewProjectForm({
         <span className="label">Vídeos brutos</span>
         <UploadDropzone ref={dropzoneRef} multiple />
         <p className="mt-2 text-xs text-ink/60">
-          Os arquivos são enviados quando você salva o projeto, com progresso individual por arquivo.
+          Os arquivos são enviados quando você salva o vídeo, com progresso individual por arquivo.
         </p>
       </div>
 
@@ -172,9 +172,9 @@ export default function NewProjectForm({
           </button>
         )}
         <button type="submit" disabled={busy} className="btn-primary">
-          {phase === "creating" && "Criando projeto…"}
+          {phase === "creating" && "Criando vídeo…"}
           {phase === "uploading" && "Enviando vídeos…"}
-          {phase === "idle" && "Criar projeto"}
+          {phase === "idle" && "Criar vídeo"}
         </button>
       </div>
     </form>

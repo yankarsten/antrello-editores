@@ -21,13 +21,13 @@ export default function DeleteEditorButton({
   async function handleDelete() {
     const consequences = [
       activeProjects > 0 &&
-        `${activeProjects} projeto${activeProjects > 1 ? "s" : ""} em andamento ficará${
+        `${activeProjects} vídeo${activeProjects > 1 ? "s" : ""} em andamento ficará${
           activeProjects > 1 ? "o" : ""
         } sem editor responsável.`,
       deliveries > 0 &&
         `As ${deliveries} entrega${deliveries > 1 ? "s" : ""} já enviada${
           deliveries > 1 ? "s" : ""
-        } continuam disponíveis nos projetos.`,
+        } continuam disponíveis nos vídeos.`,
     ].filter(Boolean);
 
     const message = [

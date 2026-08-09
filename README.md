@@ -1,6 +1,8 @@
 # Antrello Editores
 
-Ferramenta interna para gestão de projetos de edição de vídeo: a administração cria projetos, envia vídeos brutos e acompanha tudo em um quadro kanban; editores recebem projetos, baixam o material e enviam suas entregas ("Vídeo Final", "Vídeo Final R2"…).
+Ferramenta interna para gestão de edição de vídeos: a administração cria vídeos, envia os brutos e acompanha tudo em um quadro kanban; editores recebem vídeos, baixam o material e enviam suas entregas ("Vídeo Final", "Vídeo Final R2"…).
+
+Na interface a unidade de trabalho se chama **vídeo**; no código e no banco ela continua sendo `Project` (`/admin/projects`, `db.project`).
 
 ## Stack
 
@@ -12,7 +14,7 @@ Next.js 15 (App Router) · TypeScript · Tailwind CSS 3 · Prisma + SQLite · se
 npm install
 cp .env.example .env        # ajuste AUTH_SECRET/ADMIN_* se quiser
 npx prisma migrate dev      # cria o banco SQLite
-npm run db:seed             # admin + editores + projetos de exemplo
+npm run db:seed             # admin + editores + vídeos de exemplo
 npm run dev
 ```
 

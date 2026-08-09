@@ -8,7 +8,7 @@ const NAV_LINKS: Record<string, { href: string; label: string }[]> = {
     { href: "/admin/calendario", label: "Calendário" },
     { href: "/admin/editores", label: "Editores" },
   ],
-  editor: [{ href: "/editor", label: "Meus projetos" }],
+  editor: [{ href: "/editor", label: "Meus vídeos" }],
 };
 
 export default function AppShell({

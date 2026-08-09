@@ -60,7 +60,7 @@ export default function NewProjectDialog({
         <div className="flex items-start justify-between gap-4 border-b border-ink/15 px-6 py-5 sm:px-8">
           <div>
             <h2 id="new-project-title" className="text-2xl font-medium leading-tight">
-              <span className="pill">Novo projeto</span>
+              <span className="pill">Novo vídeo</span>
             </h2>
             {context.length > 0 && (
               <p className="mt-2 text-sm text-ink/70">{context.join(" · ")}</p>

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const { id } = await params;
   const project = await db.project.findUnique({ where: { id } });
-  if (!project) return NextResponse.json({ error: "Projeto não encontrado." }, { status: 404 });
+  if (!project) return NextResponse.json({ error: "Vídeo não encontrado." }, { status: 404 });
 
   const fileName = decodeURIComponent(request.headers.get("x-file-name") ?? "").trim();
   if (!fileName || !isAllowedVideo(fileName)) {

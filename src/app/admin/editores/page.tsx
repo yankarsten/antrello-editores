@@ -81,7 +81,7 @@ export default async function EditorsPage() {
                 <thead>
                   <tr className="border-b border-ink bg-mist text-xs uppercase tracking-wide text-ink">
                     <th className="px-4 py-3 font-medium">Nome</th>
-                    <th className="px-4 py-3 font-medium">Projetos ativos</th>
+                    <th className="px-4 py-3 font-medium">Vídeos ativos</th>
                     <th className="px-4 py-3 font-medium">Concluídos</th>
                     <th className="px-4 py-3 font-medium">Entregas</th>
                     <th className="px-4 py-3 font-medium">Cadastro</th>

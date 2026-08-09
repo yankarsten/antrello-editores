@@ -10,7 +10,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Antrello Editores",
-  description: "Gestão de projetos de edição de vídeo",
+  description: "Gestão de edição de vídeos",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

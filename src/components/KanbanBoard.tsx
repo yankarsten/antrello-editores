@@ -71,7 +71,7 @@ export default function KanbanBoard({
 
     if (!res || !res.ok) {
       setProjects(previous);
-      setError("Não foi possível mover o projeto. Tente novamente.");
+      setError("Não foi possível mover o vídeo. Tente novamente.");
     }
   }
 
@@ -94,8 +94,8 @@ export default function KanbanBoard({
                       <button
                         type="button"
                         onClick={() => setNewIn(status)}
-                        title="Novo projeto"
-                        aria-label={`Novo projeto em ${STATUS_LABELS[status]}`}
+                        title="Novo vídeo"
+                        aria-label={`Novo vídeo em ${STATUS_LABELS[status]}`}
                         className="flex h-7 w-7 items-center justify-center rounded-full border border-ink bg-white transition hover:bg-accent focus:outline-none focus:ring-4 focus:ring-accent/70"
                       >
                         <PlusIcon />
@@ -113,37 +113,47 @@ export default function KanbanBoard({
                       }`}
                     >
                       {cards.length === 0 && !snapshot.isDraggingOver && (
-                        <p className="px-1 py-6 text-center text-xs text-ink/50">Nenhum projeto aqui.</p>
+                        <p className="px-1 py-6 text-center text-xs text-ink/50">Nenhum vídeo aqui.</p>
                       )}
                       {cards.map((project, index) => (
                         <Draggable key={project.id} draggableId={project.id} index={index}>
                           {(dragProvided, dragSnapshot) => (
+                            // The card opens the project; dragging lives in the
+                            // grip on the right, so a click never has to
+                            // compete with a drag.
                             <div
                               ref={dragProvided.innerRef}
                               {...dragProvided.draggableProps}
-                              {...dragProvided.dragHandleProps}
-                              className={`rounded-control border border-ink bg-white p-4 transition-shadow ${
+                              className={`flex items-stretch overflow-hidden rounded-control border border-ink bg-white transition-shadow ${
                                 dragSnapshot.isDragging ? "shadow-hard" : "hover:shadow-hard-sm"
                               }`}
                             >
                               <Link
                                 href={`/admin/projects/${project.id}`}
-                                className="block text-sm font-medium text-ink hover:underline"
+                                className="min-w-0 flex-1 p-4 transition hover:bg-mist focus:outline-none focus:ring-4 focus:ring-inset focus:ring-accent/70"
                               >
-                                {project.title}
+                                <span className="block text-sm font-medium text-ink">{project.title}</span>
+                                <span className="mt-1 block text-xs text-ink/60">
+                                  {project.editorName ?? "Sem editor atribuído"}
+                                  {project.deliveryCount > 0 && (
+                                    <span>
+                                      {" · "}
+                                      {project.deliveryCount}{" "}
+                                      {project.deliveryCount === 1 ? "entrega" : "entregas"}
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="mt-3 block">
+                                  <DeadlineBadge deadline={project.deadline} status={project.status} showRelative={false} />
+                                </span>
                               </Link>
-                              <p className="mt-1 text-xs text-ink/60">
-                                {project.editorName ?? "Sem editor atribuído"}
-                                {project.deliveryCount > 0 && (
-                                  <span>
-                                    {" · "}
-                                    {project.deliveryCount}{" "}
-                                    {project.deliveryCount === 1 ? "entrega" : "entregas"}
-                                  </span>
-                                )}
-                              </p>
-                              <div className="mt-3">
-                                <DeadlineBadge deadline={project.deadline} status={project.status} showRelative={false} />
+                              <div
+                                {...dragProvided.dragHandleProps}
+                                title="Arraste para mover o vídeo"
+                                aria-label={`Arrastar ${project.title}`}
+                                className="flex shrink-0 cursor-grab items-center border-l border-ink/20 px-2.5 text-ink/40 transition hover:bg-mist hover:text-ink focus:outline-none focus:ring-4 focus:ring-inset focus:ring-accent/70 active:cursor-grabbing"
+                              >
+                                <GripIcon />
                               </div>
                             </div>
                           )}
@@ -163,6 +173,14 @@ export default function KanbanBoard({
         <NewProjectDialog editors={editors} status={newIn} onClose={() => setNewIn(null)} />
       )}
     </div>
+  );
+}
+
+function GripIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4" aria-hidden>
+      <path strokeLinecap="round" d="M3 4.5h10M3 8h10M3 11.5h10" />
+    </svg>
   );
 }
 

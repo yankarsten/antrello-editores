@@ -60,7 +60,7 @@ export default function DeliveryUpload({
       <UploadDropzone ref={dropzoneRef} multiple={false} />
 
       {error && <p className="alert-error">{error}</p>}
-      {success && <p className="alert-success">Entrega enviada! O projeto entrou em revisão.</p>}
+      {success && <p className="alert-success">Entrega enviada! O vídeo entrou em revisão.</p>}
 
       <div className="flex justify-end">
         <button type="submit" disabled={uploading} className="btn-primary">

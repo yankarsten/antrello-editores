@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { isProjectStatus } from "@/lib/constants";
+import { parseDeadlineInput } from "@/lib/format";
 import { deleteStoredFile } from "@/lib/storage";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -12,10 +13,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const { id } = await params;
   const project = await db.project.findUnique({ where: { id } });
-  if (!project) return NextResponse.json({ error: "Projeto não encontrado." }, { status: 404 });
+  if (!project) return NextResponse.json({ error: "Vídeo não encontrado." }, { status: 404 });
 
   const body = await request.json().catch(() => null);
-  const data: { status?: string; assignedEditorId?: string | null; notes?: string | null } = {};
+  const data: {
+    status?: string;
+    assignedEditorId?: string | null;
+    notes?: string | null;
+    deadline?: Date;
+  } = {};
 
   if (body && "status" in body) {
     if (typeof body.status !== "string" || !isProjectStatus(body.status)) {
@@ -34,6 +40,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     } else {
       return NextResponse.json({ error: "Editor inválido." }, { status: 400 });
     }
+  }
+
+  if (body && "deadline" in body) {
+    const deadline = parseDeadlineInput(body.deadline);
+    if (!deadline) return NextResponse.json({ error: "Informe um prazo válido." }, { status: 400 });
+    data.deadline = deadline;
   }
 
   if (body && "notes" in body) {
@@ -65,7 +77,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
     where: { id },
     include: { sourceVideos: true, deliveryVideos: true },
   });
-  if (!project) return NextResponse.json({ error: "Projeto não encontrado." }, { status: 404 });
+  if (!project) return NextResponse.json({ error: "Vídeo não encontrado." }, { status: 404 });
 
   await db.project.delete({ where: { id } });
   for (const video of [...project.sourceVideos, ...project.deliveryVideos]) {

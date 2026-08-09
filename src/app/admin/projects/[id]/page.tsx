@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { dayKey } from "@/lib/format";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import StatusBadge from "@/components/StatusBadge";
 import VideoList, { type VideoItem } from "@/components/VideoList";
@@ -63,11 +64,12 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
       <ProjectNotes projectId={project.id} initialNotes={project.notes ?? ""} />
 
       <div className="card-mist mt-6 p-6">
-        <SectionHeading>Gerenciar projeto</SectionHeading>
+        <SectionHeading>Gerenciar vídeo</SectionHeading>
         <ProjectControls
           projectId={project.id}
           currentStatus={project.status}
           currentEditorId={project.assignedEditor?.id ?? ""}
+          currentDeadline={dayKey(project.deadline)}
           editors={editors}
         />
       </div>

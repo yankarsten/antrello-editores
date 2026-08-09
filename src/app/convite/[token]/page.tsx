@@ -18,7 +18,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
           <h1 className="text-4xl font-medium tracking-tight">
             Antrello <span className="pill">Editores</span>
           </h1>
-          <p className="mt-3 text-base text-ink/70">Gestão de projetos de edição de vídeo</p>
+          <p className="mt-3 text-base text-ink/70">Gestão de edição de vídeos</p>
         </div>
 
         <div className="rounded-card border border-ink bg-white p-8 shadow-hard sm:p-10">

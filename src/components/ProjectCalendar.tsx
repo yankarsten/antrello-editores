@@ -238,8 +238,8 @@ export default function ProjectCalendar({
                       <button
                         type="button"
                         onClick={() => setNewOnDay(key)}
-                        title="Novo projeto com entrega neste dia"
-                        aria-label={`Novo projeto com entrega em ${formatDate(`${key}T12:00:00`)}`}
+                        title="Novo vídeo com entrega neste dia"
+                        aria-label={`Novo vídeo com entrega em ${formatDate(`${key}T12:00:00`)}`}
                         className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full border border-ink bg-white opacity-0 transition hover:bg-accent focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                       >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3" aria-hidden>

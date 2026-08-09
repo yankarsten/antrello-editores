@@ -13,11 +13,14 @@ export default function ProjectControls({
   projectId,
   currentStatus,
   currentEditorId,
+  currentDeadline,
   editors,
 }: {
   projectId: string;
   currentStatus: string;
   currentEditorId: string;
+  /** "YYYY-MM-DD" in the app's timezone. */
+  currentDeadline: string;
   editors: EditorOption[];
 }) {
   const router = useRouter();
@@ -41,13 +44,13 @@ export default function ProjectControls({
   }
 
   async function handleDelete() {
-    if (!window.confirm("Excluir este projeto? Os vídeos enviados também serão removidos. Essa ação não pode ser desfeita.")) {
+    if (!window.confirm("Excluir este vídeo? Os arquivos enviados também serão removidos. Essa ação não pode ser desfeita.")) {
       return;
     }
     setBusy(true);
     const res = await fetch(`/api/projects/${projectId}`, { method: "DELETE" }).catch(() => null);
     if (!res || !res.ok) {
-      setError("Não foi possível excluir o projeto.");
+      setError("Não foi possível excluir o vídeo.");
       setBusy(false);
       return;
     }
@@ -56,7 +59,7 @@ export default function ProjectControls({
 
   return (
     <div className="mt-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
           <label htmlFor="assigned-editor" className="label">Editor responsável</label>
           <select
@@ -90,11 +93,24 @@ export default function ProjectControls({
             ))}
           </select>
         </div>
+        <div>
+          <label htmlFor="deadline" className="label">Prazo de entrega</label>
+          <input
+            id="deadline"
+            type="date"
+            className="input"
+            defaultValue={currentDeadline}
+            disabled={busy}
+            // An empty value means the date is still half-typed — only a
+            // complete date is worth persisting.
+            onChange={(e) => e.target.value && patch({ deadline: e.target.value })}
+          />
+        </div>
       </div>
       {error && <p className="alert-error mt-4">{error}</p>}
       <div className="mt-5 border-t border-ink/15 pt-5">
         <button type="button" onClick={handleDelete} disabled={busy} className="btn-danger !px-3 !py-1.5 text-xs">
-          Excluir projeto
+          Excluir vídeo
         </button>
       </div>
     </div>

@@ -42,7 +42,7 @@ export default async function CalendarPage() {
     <div>
       <PageHeader
         title="Calendário"
-        subtitle="Entregas de todos os projetos por data de prazo. Clique em um dia para ver os detalhes ou use o + do dia para criar um projeto com esse prazo."
+        subtitle="Entregas de todos os vídeos por data de prazo. Clique em um dia para ver os detalhes ou use o + do dia para criar um vídeo com esse prazo."
       />
       {/* todayKey comes from the server so the "hoje" highlight can't drift
           between server and client render. */}

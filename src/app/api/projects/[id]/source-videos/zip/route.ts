@@ -41,7 +41,7 @@ function zipFileName(title: string): string {
     .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .toLowerCase();
-  return `${slug || "projeto"}-brutos.zip`;
+  return `${slug || "video"}-brutos.zip`;
 }
 
 // Bundles every raw video of a project into a single .zip download. Entries are
@@ -56,12 +56,12 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     where: { id },
     include: { sourceVideos: { orderBy: { uploadedAt: "asc" } } },
   });
-  if (!project) return NextResponse.json({ error: "Projeto não encontrado." }, { status: 404 });
+  if (!project) return NextResponse.json({ error: "Vídeo não encontrado." }, { status: 404 });
 
   const isAdmin = session.role === "admin";
   const isAssignedEditor = project.assignedEditorId === session.userId;
   if (!isAdmin && !isAssignedEditor) {
-    return NextResponse.json({ error: "Projeto não encontrado." }, { status: 404 });
+    return NextResponse.json({ error: "Vídeo não encontrado." }, { status: 404 });
   }
 
   // Skip records whose file vanished from storage — one missing file should not

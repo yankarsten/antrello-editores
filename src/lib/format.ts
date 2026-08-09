@@ -34,6 +34,16 @@ export function formatDateTime(date: Date | string): string {
   return dateTimeFormatter.format(new Date(date));
 }
 
+/**
+ * A deadline is a day, not a moment: the "YYYY-MM-DD" that comes from a date
+ * input lands at 18:00 of that day. Returns null for anything unparseable.
+ */
+export function parseDeadlineInput(value: unknown): Date | null {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}T18:00:00`);
+  return isNaN(date.getTime()) ? null : date;
+}
+
 /** Whole days between today and the deadline; negative = overdue. */
 export function daysUntil(deadline: Date | string): number {
   const now = new Date();
