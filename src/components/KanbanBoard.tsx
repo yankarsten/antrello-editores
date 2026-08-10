@@ -17,6 +17,7 @@ import type { EditorOption } from "@/lib/editors";
 export interface BoardProject {
   id: string;
   title: string;
+  description: string | null;
   status: string;
   deadline: string;
   editorName: string | null;
@@ -135,7 +136,19 @@ export default function KanbanBoard({
                                 className="min-w-0 flex-1 p-4 transition hover:bg-mist focus:outline-none focus:ring-4 focus:ring-inset focus:ring-accent/70"
                               >
                                 <span className="block text-sm font-medium text-ink">{project.title}</span>
-                                <span className="mt-1 block text-xs text-ink/60">
+                                {/* The briefing, set apart from the card's own
+                                    facts (editor, entregas) by the rule and the
+                                    italic — it is the video's own words. One
+                                    line only: the rest is on the video page. */}
+                                {project.description && (
+                                  <span
+                                    title={project.description}
+                                    className="mt-1.5 block truncate border-l-2 border-ink/20 pl-2 text-xs italic leading-relaxed text-ink/55"
+                                  >
+                                    {project.description}
+                                  </span>
+                                )}
+                                <span className="mt-1.5 block text-xs text-ink/60">
                                   {project.editorName ?? "Sem editor atribuído"}
                                   {project.deliveryCount > 0 && (
                                     <span>

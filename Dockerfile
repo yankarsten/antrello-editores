@@ -3,10 +3,15 @@
 # node_modules so Prisma migrate/seed and `next start` all work.
 
 FROM node:20-bookworm-slim AS base
-# Prisma's query engine needs openssl at runtime.
+# Prisma's query engine needs openssl at runtime; tzdata gives the container a
+# real zone database instead of a bare UTC clock.
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && apt-get install -y --no-install-recommends openssl ca-certificates tzdata \
   && rm -rf /var/lib/apt/lists/*
+# The app resolves every date through America/Sao_Paulo on its own (see
+# lib/format.ts), so this is not what makes the dates right — it just keeps the
+# container's own clock and logs on Brazilian time instead of UTC.
+ENV TZ=America/Sao_Paulo
 WORKDIR /app
 
 # ---- deps ----

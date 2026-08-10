@@ -19,6 +19,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const data: {
     status?: string;
     assignedEditorId?: string | null;
+    description?: string | null;
     notes?: string | null;
     deadline?: Date;
   } = {};
@@ -46,6 +47,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const deadline = parseDeadlineInput(body.deadline);
     if (!deadline) return NextResponse.json({ error: "Informe um prazo válido." }, { status: 400 });
     data.deadline = deadline;
+  }
+
+  if (body && "description" in body) {
+    if (body.description === null) {
+      data.description = null;
+    } else if (typeof body.description === "string") {
+      data.description = body.description.trim() || null;
+    } else {
+      return NextResponse.json({ error: "Descrição inválida." }, { status: 400 });
+    }
   }
 
   if (body && "notes" in body) {

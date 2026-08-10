@@ -23,6 +23,7 @@ export default async function AdminBoardPage() {
   const boardProjects: BoardProject[] = projects.map((p) => ({
     id: p.id,
     title: p.title,
+    description: p.description,
     status: p.status,
     deadline: p.deadline.toISOString(),
     editorName: p.assignedEditor?.name ?? null,

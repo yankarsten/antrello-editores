@@ -9,7 +9,7 @@ import SectionNav from "@/components/SectionNav";
 import { listEditorOptions } from "@/lib/editors";
 import { SectionHeading } from "@/components/PageHeader";
 import ProjectControls from "./ProjectControls";
-import ProjectNotes from "./ProjectNotes";
+import ProjectTextField from "./ProjectTextField";
 import AddSourceVideos from "./AddSourceVideos";
 import AddAttachments from "./AddAttachments";
 import AddDeliveryVideos from "./AddDeliveryVideos";
@@ -79,11 +79,25 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
         ]}
       />
 
-      {project.description && (
-        <p className="mt-5 whitespace-pre-wrap text-sm leading-relaxed text-ink/70">{project.description}</p>
-      )}
+      <ProjectTextField
+        projectId={project.id}
+        field="description"
+        label="Descrição"
+        placeholder="Briefing, referências, duração esperada…"
+        initialValue={project.description ?? ""}
+        saveLabel="Salvar descrição"
+        savedLabel="Descrição salva"
+      />
 
-      <ProjectNotes projectId={project.id} initialNotes={project.notes ?? ""} />
+      <ProjectTextField
+        projectId={project.id}
+        field="notes"
+        label="Observações"
+        placeholder="Anotações internas, ajustes pedidos pelo cliente, pontos de atenção…"
+        initialValue={project.notes ?? ""}
+        saveLabel="Salvar observações"
+        savedLabel="Observações salvas"
+      />
 
       <div className="card-mist mt-6 p-6">
         <SectionHeading>Gerenciar vídeo</SectionHeading>
