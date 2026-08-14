@@ -14,13 +14,16 @@ export async function POST(request: NextRequest) {
   const title = typeof body?.title === "string" ? body.title.trim() : "";
   const description = typeof body?.description === "string" ? body.description.trim() : "";
   const notes = typeof body?.notes === "string" ? body.notes.trim() : "";
-  const deadline = parseDeadlineInput(body?.deadline);
+  // The deadline is optional — but a value that was sent and can't be parsed is
+  // an error, not a video without a prazo.
+  const hasDeadline = typeof body?.deadline === "string" && body.deadline !== "";
+  const deadline = hasDeadline ? parseDeadlineInput(body.deadline) : null;
   const assignedEditorId = typeof body?.assignedEditorId === "string" && body.assignedEditorId ? body.assignedEditorId : null;
   // Creating from a board column seeds that column's status.
   const status = typeof body?.status === "string" && isProjectStatus(body.status) ? body.status : DEFAULT_STATUS;
 
   if (!title) return NextResponse.json({ error: "Informe o título do vídeo." }, { status: 400 });
-  if (!deadline) return NextResponse.json({ error: "Informe um prazo válido." }, { status: 400 });
+  if (hasDeadline && !deadline) return NextResponse.json({ error: "Informe um prazo válido." }, { status: 400 });
 
   if (assignedEditorId) {
     const editor = await db.user.findFirst({ where: { id: assignedEditorId, role: "editor" } });

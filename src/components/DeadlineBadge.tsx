@@ -14,19 +14,37 @@ export default function DeadlineBadge({
   status,
   showRelative = true,
 }: {
-  deadline: Date | string;
+  /** null when the video has no delivery date yet. */
+  deadline: Date | string | null;
   status?: string;
   showRelative?: boolean;
 }) {
+  // No deadline is a state, not a missing value: it gets the same chip, in the
+  // neutral tone, so a card never looks broken for lacking a date.
+  if (!deadline) {
+    return (
+      <span className={`chip ${TONE_CLASSES.ok} text-ink/60`} title="Sem prazo de entrega definido">
+        <CalendarIcon />
+        Sem prazo
+      </span>
+    );
+  }
+
   const tone = deadlineTone(deadline, status);
   const done = isDoneStatus(status);
   return (
     <span className={`chip ${TONE_CLASSES[tone]}`} title={`Prazo: ${formatDate(deadline)}`}>
-      <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3" aria-hidden>
-        <path d="M4 1.75a.75.75 0 0 1 1.5 0V3h5V1.75a.75.75 0 0 1 1.5 0V3h.5A1.5 1.5 0 0 1 14 4.5v8A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-8A1.5 1.5 0 0 1 3.5 3H4V1.75ZM3.5 6v6.5h9V6h-9Z" />
-      </svg>
+      <CalendarIcon />
       {formatDate(deadline)}
       {showRelative && !done && <span className="opacity-70">· {deadlineText(deadline)}</span>}
     </span>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3" aria-hidden>
+      <path d="M4 1.75a.75.75 0 0 1 1.5 0V3h5V1.75a.75.75 0 0 1 1.5 0V3h.5A1.5 1.5 0 0 1 14 4.5v8A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-8A1.5 1.5 0 0 1 3.5 3H4V1.75ZM3.5 6v6.5h9V6h-9Z" />
+    </svg>
   );
 }

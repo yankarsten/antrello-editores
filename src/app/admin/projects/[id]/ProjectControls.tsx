@@ -16,7 +16,7 @@ export default function ProjectControls({
   projectId: string;
   currentStatus: string;
   currentEditorId: string;
-  /** "YYYY-MM-DD" in the app's timezone. */
+  /** "YYYY-MM-DD" in the app's timezone, or "" when the video has no prazo. */
   currentDeadline: string;
   editors: EditorOption[];
 }) {
@@ -24,6 +24,7 @@ export default function ProjectControls({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [editorId, setEditorId] = useState(currentEditorId);
+  const [deadline, setDeadline] = useState(currentDeadline);
 
   async function patch(body: Record<string, unknown>) {
     setBusy(true);
@@ -91,12 +92,29 @@ export default function ProjectControls({
             id="deadline"
             type="date"
             className="input"
-            defaultValue={currentDeadline}
+            value={deadline}
             disabled={busy}
             // An empty value means the date is still half-typed — only a
-            // complete date is worth persisting.
-            onChange={(e) => e.target.value && patch({ deadline: e.target.value })}
+            // complete date is worth persisting. Clearing the prazo is an
+            // explicit action, on the button below.
+            onChange={(e) => {
+              setDeadline(e.target.value);
+              if (e.target.value) patch({ deadline: e.target.value });
+            }}
           />
+          {deadline && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                setDeadline("");
+                patch({ deadline: null });
+              }}
+              className="mt-2 text-xs text-ink/60 underline underline-offset-2 transition hover:text-ink"
+            >
+              Remover prazo
+            </button>
+          )}
         </div>
       </div>
       {error && <p className="alert-error mt-4">{error}</p>}

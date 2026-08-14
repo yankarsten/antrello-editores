@@ -59,7 +59,8 @@ model Project {
   title            String
   description      String?
   notes            String?
-  deadline         DateTime
+  // Optional: a video can be planned before anyone commits to a delivery date.
+  deadline         DateTime?
   status           String   @default("a_gravar")
   assignedEditorId String?
   createdById      String

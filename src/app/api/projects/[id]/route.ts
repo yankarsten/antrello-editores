@@ -21,7 +21,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     assignedEditorId?: string | null;
     description?: string | null;
     notes?: string | null;
-    deadline?: Date;
+    deadline?: Date | null;
   } = {};
 
   if (body && "status" in body) {
@@ -44,9 +44,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   if (body && "deadline" in body) {
-    const deadline = parseDeadlineInput(body.deadline);
-    if (!deadline) return NextResponse.json({ error: "Informe um prazo válido." }, { status: 400 });
-    data.deadline = deadline;
+    // null/"" clears the prazo — a video is allowed to have none.
+    if (body.deadline === null || body.deadline === "") {
+      data.deadline = null;
+    } else {
+      const deadline = parseDeadlineInput(body.deadline);
+      if (!deadline) return NextResponse.json({ error: "Informe um prazo válido." }, { status: 400 });
+      data.deadline = deadline;
+    }
   }
 
   if (body && "description" in body) {

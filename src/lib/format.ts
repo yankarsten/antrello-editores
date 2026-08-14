@@ -81,6 +81,22 @@ function daysBetweenKeys(fromKey: string, toKey: string): number {
   return Math.round((to - from) / 86_400_000);
 }
 
+export type SortDirection = "asc" | "desc";
+
+/**
+ * Orders two deadlines. A video without a deadline has no place on the
+ * timeline, so it lands at the end of the list whichever way the sort points.
+ */
+export function compareDeadlines(
+  a: Date | string | null,
+  b: Date | string | null,
+  direction: SortDirection = "asc"
+): number {
+  if (!a || !b) return a ? -1 : b ? 1 : 0;
+  const diff = new Date(a).getTime() - new Date(b).getTime();
+  return direction === "asc" ? diff : -diff;
+}
+
 export type DeadlineTone = "overdue" | "soon" | "ok";
 
 export function deadlineTone(deadline: Date | string, status?: string): DeadlineTone {

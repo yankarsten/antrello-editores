@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   DragDropContext,
   Droppable,
@@ -10,6 +11,7 @@ import {
 } from "@hello-pangea/dnd";
 import { DEFAULT_STATUS, STATUSES, STATUS_LABELS, type ProjectStatus } from "@/lib/constants";
 import { STATUS_FILL } from "@/lib/status-ui";
+import { compareDeadlines, type SortDirection } from "@/lib/format";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import NewProjectDialog from "@/components/NewProjectDialog";
 import type { EditorOption } from "@/lib/editors";
@@ -19,7 +21,8 @@ export interface BoardProject {
   title: string;
   description: string | null;
   status: string;
-  deadline: string;
+  /** null when the video has no prazo yet. */
+  deadline: string | null;
   editorName: string | null;
   deliveryCount: number;
 }
@@ -34,34 +37,47 @@ export default function KanbanBoard({
   /** Admins only: shows the per-column "+" that creates a project. */
   canCreate?: boolean;
 }) {
+  const router = useRouter();
   const [projects, setProjects] = useState(initialProjects);
   const [error, setError] = useState<string | null>(null);
   const [newIn, setNewIn] = useState<ProjectStatus | null>(null);
+  // Farthest prazo first by default; the toggle flips it.
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   // A project created in the dialog arrives through a router.refresh(), which
   // re-renders the server page and hands us a fresh list to adopt.
   useEffect(() => setProjects(initialProjects), [initialProjects]);
 
+  // Arriving at the board — from another section, the browser's back button or
+  // another browser tab — re-reads the server instead of trusting the cached
+  // RSC payload, which may predate a status change made somewhere else.
+  useEffect(() => {
+    router.refresh();
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible") router.refresh();
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [router]);
+
+  // Cards are ordered by prazo, never by where they were dropped, so a column
+  // reads the same whether it was just rearranged or freshly loaded.
+  const cardsByStatus = useMemo(() => {
+    const sorted = [...projects].sort((a, b) => compareDeadlines(a.deadline, b.deadline, sortDirection));
+    return new Map(STATUSES.map((status) => [status, sorted.filter((p) => p.status === status)]));
+  }, [projects, sortDirection]);
+
   async function onDragEnd(result: DropResult) {
     const { draggableId, destination, source } = result;
     if (!destination) return;
-    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+    // Only the column matters — the order inside it belongs to the prazo sort.
+    if (destination.droppableId === source.droppableId) return;
 
     const newStatus = destination.droppableId as ProjectStatus;
     const previous = projects;
 
-    // Optimistic move: reposition the card locally, then persist.
-    setProjects((prev) => {
-      const moved = prev.find((p) => p.id === draggableId);
-      if (!moved) return prev;
-      const rest = prev.filter((p) => p.id !== draggableId);
-      const destCards = rest.filter((p) => p.status === newStatus);
-      const insertAfter = destCards[destination.index - 1] ?? null;
-      const updated = { ...moved, status: newStatus };
-      const idx = insertAfter ? rest.indexOf(insertAfter) + 1 : rest.findIndex((p) => p.status === newStatus);
-      const at = idx === -1 ? rest.length : idx;
-      return [...rest.slice(0, at), updated, ...rest.slice(at)];
-    });
+    // Optimistic move: restatus the card locally, then persist.
+    setProjects((prev) => prev.map((p) => (p.id === draggableId ? { ...p, status: newStatus } : p)));
 
     setError(null);
     const res = await fetch(`/api/projects/${draggableId}`, {
@@ -73,18 +89,45 @@ export default function KanbanBoard({
     if (!res || !res.ok) {
       setProjects(previous);
       setError("Não foi possível mover o vídeo. Tente novamente.");
+      return;
     }
+
+    // The move is now server state: refreshing drops the cached RSC payload of
+    // this page (and of the calendar), so coming back to the tab doesn't show
+    // the card in the column it left.
+    router.refresh();
   }
 
   return (
     <div>
       {error && <p className="alert-error mb-4">{error}</p>}
+      <div className="mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setSortDirection((dir) => (dir === "desc" ? "asc" : "desc"))}
+          aria-pressed={sortDirection === "asc"}
+          title={
+            sortDirection === "desc"
+              ? "Ordenar do prazo mais próximo para o mais distante"
+              : "Ordenar do prazo mais distante para o mais próximo"
+          }
+          className="btn-secondary !px-3 !py-1.5 text-xs"
+        >
+          Prazo{" "}
+          <span aria-hidden className="font-medium">
+            {sortDirection === "desc" ? "↓" : "↑"}
+          </span>{" "}
+          <span className="text-ink/60">
+            {sortDirection === "desc" ? "mais distante primeiro" : "mais próximo primeiro"}
+          </span>
+        </button>
+      </div>
       <DragDropContext onDragEnd={onDragEnd}>
         {/* Four columns only fit side by side on a wide screen; below that they
             pair up rather than shrinking into unreadable strips. */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {STATUSES.map((status) => {
-            const cards = projects.filter((p) => p.status === status);
+            const cards = cardsByStatus.get(status) ?? [];
             return (
               <div key={status} className="card-mist flex min-h-[300px] flex-col">
                 <div className="flex items-center justify-between gap-2 px-5 pb-3 pt-5">

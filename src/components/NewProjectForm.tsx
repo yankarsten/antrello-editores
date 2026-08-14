@@ -122,16 +122,16 @@ export default function NewProjectForm({
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="deadline" className="label">Prazo de entrega *</label>
+          <label htmlFor="deadline" className="label">Prazo de entrega</label>
           <input
             id="deadline"
             type="date"
-            required
             className="input"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
             disabled={busy}
           />
+          <p className="mt-2 text-xs text-ink/60">Opcional — pode ser definido depois.</p>
         </div>
         <EditorSelect
           id="editor"

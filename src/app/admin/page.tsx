@@ -15,17 +15,19 @@ export default async function AdminBoardPage() {
         assignedEditor: { select: { name: true } },
         _count: { select: { deliveryVideos: true } },
       },
-      orderBy: { deadline: "asc" },
+      orderBy: { title: "asc" },
     }),
     listEditorOptions(),
   ]);
 
+  // The board sorts by prazo itself (the direction is a toggle there), so the
+  // query only needs a stable order to hand over.
   const boardProjects: BoardProject[] = projects.map((p) => ({
     id: p.id,
     title: p.title,
     description: p.description,
     status: p.status,
-    deadline: p.deadline.toISOString(),
+    deadline: p.deadline?.toISOString() ?? null,
     editorName: p.assignedEditor?.name ?? null,
     deliveryCount: p._count.deliveryVideos,
   }));

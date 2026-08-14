@@ -20,15 +20,19 @@ export default async function CalendarPage() {
     listEditorOptions(),
   ]);
 
-  const calendarProjects: CalendarProject[] = projects.map((p) => ({
-    id: p.id,
-    title: p.title,
-    status: p.status,
-    day: dayKey(p.deadline),
-    editorId: p.assignedEditor?.id ?? null,
-    editorName: p.assignedEditor?.name ?? null,
-    deliveryCount: p._count.deliveryVideos,
-  }));
+  // A video without a prazo has no day to sit on, so the calendar simply
+  // doesn't show it — the board does.
+  const calendarProjects: CalendarProject[] = projects
+    .filter((p) => p.deadline !== null)
+    .map((p) => ({
+      id: p.id,
+      title: p.title,
+      status: p.status,
+      day: dayKey(p.deadline!),
+      editorId: p.assignedEditor?.id ?? null,
+      editorName: p.assignedEditor?.name ?? null,
+      deliveryCount: p._count.deliveryVideos,
+    }));
 
   return (
     <div>

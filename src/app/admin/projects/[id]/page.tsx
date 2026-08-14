@@ -105,7 +105,7 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
           projectId={project.id}
           currentStatus={project.status}
           currentEditorId={project.assignedEditor?.id ?? ""}
-          currentDeadline={dayKey(project.deadline)}
+          currentDeadline={project.deadline ? dayKey(project.deadline) : ""}
           editors={editors}
         />
       </div>

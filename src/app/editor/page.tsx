@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { isDoneStatus } from "@/lib/constants";
+import { compareDeadlines } from "@/lib/format";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import StatusBadge from "@/components/StatusBadge";
 import PageHeader from "@/components/PageHeader";
@@ -14,7 +15,7 @@ interface EditorProject {
   title: string;
   description: string | null;
   status: string;
-  deadline: Date;
+  deadline: Date | null;
   _count: { sourceVideos: number; deliveryVideos: number };
 }
 
@@ -22,13 +23,15 @@ export default async function EditorDashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const projects = await db.project.findMany({
+  const rows = await db.project.findMany({
     where: { assignedEditorId: session.userId },
     include: {
       _count: { select: { sourceVideos: true, deliveryVideos: true } },
     },
-    orderBy: { deadline: "asc" },
   });
+  // Nearest deadline first; videos without one close the list (SQLite would
+  // otherwise sort their NULLs to the top).
+  const projects = rows.sort((a, b) => compareDeadlines(a.deadline, b.deadline));
 
   // Finished work never competes for attention with the deadline-sorted
   // active list: it always sits below the divider, newest deadline last.
